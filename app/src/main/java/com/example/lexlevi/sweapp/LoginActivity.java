@@ -66,12 +66,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
-    private Socket mSocket;
-    {
-        try {
-            mSocket = IO.socket("http://192.168.1.112:3000");
-        } catch (URISyntaxException e) {}
-    }
+//    private Socket mSocket;
+//    {
+//        try {
+//            mSocket = IO.socket("http://192.168.1.112:3000");
+//        } catch (URISyntaxException e) {}
+//    }
 
 
     @Override
@@ -94,7 +94,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mSocket.connect();
+        //mSocket.connect();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
