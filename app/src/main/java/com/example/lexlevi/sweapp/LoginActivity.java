@@ -1,5 +1,6 @@
 package com.example.lexlevi.sweapp;
 
+import android.content.Intent;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -31,6 +32,8 @@ import android.widget.TextView;
 
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,18 +69,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
 
-//    private Socket mSocket;
-//    {
-//        try {
-//            mSocket = IO.socket("http://192.168.1.112:3000");
-//        } catch (URISyntaxException e) {}
-//    }
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("http://192.168.1.112:3000");
+        } catch (URISyntaxException e) {}
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setTitle(" ");
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -94,7 +98,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        //mSocket.connect();
+        mSocket.connect();
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -104,7 +108,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+        TextView mRegisterButton = (TextView) findViewById(R.id.action_register);
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,7 +232,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void goToRegistration() {
-        //..
+        Intent intent = new Intent(this, SignupActivity.class);
+        startActivity(intent);
     }
 
     /**
