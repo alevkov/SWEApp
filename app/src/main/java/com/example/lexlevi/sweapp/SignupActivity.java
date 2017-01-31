@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
-import android.content.DialogInterface;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -169,17 +168,17 @@ public class SignupActivity extends AppCompatActivity {
     public void signup() {
         Log.d(TAG, "Signup");
 
-//        if (!validate()) {
-//            onSignupFailed();
-//            return;
-//        }
-//
-//        _signupButton.setEnabled(false);
-//
-//        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
-//                R.style.AppTheme_Dark_Dialog);
-//        progressDialog.setIndeterminate(true);
-//        progressDialog.setMessage("Creating Account...");
+        if (!validate()) {
+            onSignupFailed();
+            return;
+        }
+
+        _signupButton.setEnabled(false);
+
+        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
+                R.style.AppTheme);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Creating Account...");
 //        progressDialog.show();
 //
 //        String name = _nameText.getText().toString();
