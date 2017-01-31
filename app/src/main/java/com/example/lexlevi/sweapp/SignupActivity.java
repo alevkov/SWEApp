@@ -1,5 +1,9 @@
 package com.example.lexlevi.sweapp;
 
+import com.example.lexlevi.sweapp.Common.URLs;
+import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Models.User;
+
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,8 +20,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
 
+import retrofit2.*;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";
@@ -179,24 +186,34 @@ public class SignupActivity extends AppCompatActivity {
                 R.style.AppTheme);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Creating Account...");
-//        progressDialog.show();
-//
-//        String name = _nameText.getText().toString();
-//        String email = _emailText.getText().toString();
-//        String password = _passwordText.getText().toString();
-//
-//        // TODO: Implement your own signup logic here.
-//
-//        new android.os.Handler().postDelayed(
-//                new Runnable() {
-//                    public void run() {
-//                        // On complete call either onSignupSuccess or onSignupFailed
-//                        // depending on success
-//                        onSignupSuccess();
-//                        // onSignupFailed();
-//                        progressDialog.dismiss();
-//                    }
-//                }, 3000);
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.BASE_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        User user = new User();
+        String name = _usernameText.getText().toString();
+        String email = _emailText.getText().toString();
+        String password = _passwordText.getText().toString();
+        user.setEmail(email);
+        user.setUserName(name);
+        user.setPassword(password);
+        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
+        Call<User> call = chatServerAPI.createUser(user);
+        progressDialog.show();
+        call.enqueue(new Callback<User>() {
+             @Override
+             public void onResponse(Call<User> call, Response<User> response) {
+                 Log.d("New user: ", response.body().toString());
+                 progressDialog.hide();
+             }
+
+             @Override
+             public void onFailure(Call<User> call, Throwable t) {
+                 progressDialog.hide();
+             }
+        });
     }
 
 
