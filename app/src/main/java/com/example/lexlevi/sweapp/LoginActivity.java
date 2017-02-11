@@ -200,11 +200,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        return email.contains("@") && email.contains(".");
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mEmailView.setError("enter a valid email address");
+            return false;
+        } else {
+            mEmailView.setError(null);
+            return true;
+        }
+
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 1;
+        if (password.isEmpty() || password.length() < 4 || password.length() > 20) {
+            mPasswordView.setError("between 4 and 20 alphanumeric characters");
+            return false;
+        } else {
+            mPasswordView.setError(null);
+            return true;
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)

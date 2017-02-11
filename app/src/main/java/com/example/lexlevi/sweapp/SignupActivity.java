@@ -27,7 +27,6 @@ import butterknife.InjectView;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignupActivity extends AppCompatActivity {
-    private static final String TAG = "SignupActivity";
 
     @InjectView(R.id.input_username) EditText _usernameText;
     @InjectView(R.id.input_firstname) EditText _firstnameText;
@@ -75,7 +74,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
-
                 dialog.show();
             }
         });
@@ -116,7 +114,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
-
                 dialog.show();
             }
         });
@@ -151,7 +148,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
-
                 dialog.show();
             }
         });
@@ -173,15 +169,11 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void signup() {
-        Log.d(TAG, "Signup");
-
         if (!validate()) {
             onSignupFailed();
             return;
         }
-
         _signupButton.setEnabled(false);
-
         final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
                 R.style.AppTheme);
         progressDialog.setIndeterminate(true);
@@ -205,7 +197,6 @@ public class SignupActivity extends AppCompatActivity {
         call.enqueue(new Callback<User>() {
              @Override
              public void onResponse(Call<User> call, Response<User> response) {
-                 Log.d("New user: ", response.body().toString());
                  progressDialog.hide();
              }
 
