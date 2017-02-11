@@ -1,5 +1,6 @@
 package com.example.lexlevi.sweapp.Controllers;
 
+import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Common.URLs;
 
@@ -16,6 +17,10 @@ public interface ChatServerAPI {
 
     @POST(URLs.kUserLogin)
     Call<User> loginUser(@Body User user);
+
+    // Courses
+    @GET(URLs.kGetCourses)
+    Call<List<Course>> getAllCourses();
 
     // Groups
     @GET("group/{id}/users")

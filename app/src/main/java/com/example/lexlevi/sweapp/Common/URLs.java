@@ -9,4 +9,7 @@ public class URLs {
     public static final String kGetUsers = "users";
     public static final String kUserLogin = "users/login";
     public static final String kUserSignup = "users/new";
+
+    // Courses Endpoints
+    public static final String kGetCourses = "courses";
 }
