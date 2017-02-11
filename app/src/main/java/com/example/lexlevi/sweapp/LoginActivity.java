@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,12 +32,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.lexlevi.sweapp.Common.URLs;
+import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.UserSession;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.net.*;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -49,14 +59,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -216,13 +218,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+        return email.contains("@") && email.contains(".");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 1;
     }
 
     /**
@@ -322,7 +322,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 
     /**
@@ -342,23 +341,46 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(URLs.BASE_API)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            User user = new User();
+            user.setEmail(mEmail);
+            user.setPassword(mPassword);
+            ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
+            Call<User> call = chatServerAPI.loginUser(user);
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    showProgress(false);
+                    switch (response.code()) {
+                        case 200:
+                            UserSession.getInstance().setCurrentUser(response.body());
+                            break;
+                        case 404:
+                            mEmailView.setError(getString(R.string.error_user_nonexist));
+                            mEmailView.requestFocus();
+                            break;
+                        case 403:
+                            mPasswordView.setError(getString(R.string.error_incorrect_password));
+                            mPasswordView.requestFocus();
+                            break;
+                    }
+                }
 
-
-
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    showProgress(false);
+                    Log.d("Error: ", t.toString());
+                }
+            });
             return true;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
         }
 
         @Override

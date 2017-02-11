@@ -34,7 +34,7 @@
 
             <ImageView android:src="@drawable/logo"
                 android:layout_width="wrap_content"
-                android:layout_height="110dp"
+                android:layout_height="160dp"
                 android:layout_marginBottom="24dp"
                 android:layout_marginTop="18dp"
                 android:layout_gravity="center_horizontal" />
@@ -51,6 +51,8 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:textColor="@color/textColor"
+                    android:textColorHighlight="@color/hilightColor"
+                    android:textCursorDrawable="@null"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
@@ -70,6 +72,8 @@
                     android:inputType="textPassword"
                     android:maxLines="1"
                     android:textColor="@color/textColor"
+                    android:textColorHighlight="@color/hilightColor"
+                    android:textCursorDrawable="@null"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
