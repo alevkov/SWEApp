@@ -9,8 +9,8 @@ import retrofit2.Call;
 import java.util.List;
 
 public interface ChatServerAPI {
-    // Users
 
+    // Users
     @POST(URLs.kUserSignup)
     Call<User> createUser(@Body User user);
 
@@ -18,7 +18,6 @@ public interface ChatServerAPI {
     Call<User> loginUser(@Body User user);
 
     // Groups
-
     @GET("group/{id}/users")
     Call<List<User>> groupList(@Path("id") int groupId, @Query("sort") String sort);
 }

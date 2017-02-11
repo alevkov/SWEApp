@@ -1,9 +1,5 @@
 package com.example.lexlevi.sweapp.Common;
 
-/**
- * Created by lexlevi on 1/30/17.
- */
-
 public class URLs {
 
     // Base

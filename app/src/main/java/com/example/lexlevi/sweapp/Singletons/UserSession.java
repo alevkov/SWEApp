@@ -2,10 +2,6 @@ package com.example.lexlevi.sweapp.Singletons;
 
 import com.example.lexlevi.sweapp.Models.User;
 
-/**
- * Created by lexlevi on 2/1/17.
- */
-
 public class UserSession {
     private static UserSession instance = null;
     private User currentUser;
