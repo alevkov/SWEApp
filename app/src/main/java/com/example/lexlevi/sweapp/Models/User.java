@@ -12,6 +12,9 @@ public class User {
     @SerializedName("major")
     @Expose
     private String major;
+    @SerializedName("contrubution")
+    @Expose
+    private Integer contribution;
     @SerializedName("email")
     @Expose
     private String email;
@@ -36,6 +39,9 @@ public class User {
     @SerializedName("courses")
     @Expose
     private List<Object> courses = null;
+    @SerializedName("groups")
+    @Expose
+    private List<Object> groups = null;
 
     public String getYear() {
         return year;
@@ -59,6 +65,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Integer getContribution() {
+        return contribution;
+    }
+
+    public void setContribution(Integer contribution) {
+        this.contribution = contribution;
     }
 
     public String getLastName() {
@@ -115,6 +129,12 @@ public class User {
 
     public void setCourses(List<Object> courses) {
         this.courses = courses;
+    }
+
+    public List<Object> getGroups() { return groups; }
+
+    public void setGroups(List<Object> groups) {
+        this.groups = groups;
     }
 
 }
