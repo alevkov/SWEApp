@@ -1,5 +1,9 @@
 package com.example.lexlevi.sweapp;
 
+import com.example.lexlevi.sweapp.Common.URLs;
+import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Models.User;
+
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,13 +19,14 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
-import android.content.DialogInterface;
+
+import retrofit2.*;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SignupActivity extends AppCompatActivity {
-    private static final String TAG = "SignupActivity";
 
     @InjectView(R.id.input_username) EditText _usernameText;
     @InjectView(R.id.input_firstname) EditText _firstnameText;
@@ -69,7 +74,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
-
                 dialog.show();
             }
         });
@@ -110,7 +114,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
-
                 dialog.show();
             }
         });
@@ -145,7 +148,6 @@ public class SignupActivity extends AppCompatActivity {
                         }
                     }
                 });
-
                 dialog.show();
             }
         });
@@ -167,37 +169,42 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void signup() {
-        Log.d(TAG, "Signup");
+        if (!validate()) {
+            onSignupFailed();
+            return;
+        }
+        _signupButton.setEnabled(false);
+        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
+                R.style.AppTheme);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Creating Account...");
 
-//        if (!validate()) {
-//            onSignupFailed();
-//            return;
-//        }
-//
-//        _signupButton.setEnabled(false);
-//
-//        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
-//                R.style.AppTheme_Dark_Dialog);
-//        progressDialog.setIndeterminate(true);
-//        progressDialog.setMessage("Creating Account...");
-//        progressDialog.show();
-//
-//        String name = _nameText.getText().toString();
-//        String email = _emailText.getText().toString();
-//        String password = _passwordText.getText().toString();
-//
-//        // TODO: Implement your own signup logic here.
-//
-//        new android.os.Handler().postDelayed(
-//                new Runnable() {
-//                    public void run() {
-//                        // On complete call either onSignupSuccess or onSignupFailed
-//                        // depending on success
-//                        onSignupSuccess();
-//                        // onSignupFailed();
-//                        progressDialog.dismiss();
-//                    }
-//                }, 3000);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.BASE_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        User user = new User();
+        String name = _usernameText.getText().toString();
+        String email = _emailText.getText().toString();
+        String password = _passwordText.getText().toString();
+        user.setEmail(email);
+        user.setUserName(name);
+        user.setPassword(password);
+        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
+        Call<User> call = chatServerAPI.createUser(user);
+        progressDialog.show();
+        call.enqueue(new Callback<User>() {
+             @Override
+             public void onResponse(Call<User> call, Response<User> response) {
+                 progressDialog.hide();
+             }
+
+             @Override
+             public void onFailure(Call<User> call, Throwable t) {
+                 progressDialog.hide();
+             }
+        });
     }
 
 
@@ -208,7 +215,7 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
 
         _signupButton.setEnabled(true);
     }
@@ -234,8 +241,8 @@ public class SignupActivity extends AppCompatActivity {
             _emailText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            _passwordText.setError("between 4 and 10 alphanumeric characters");
+        if (password.isEmpty() || password.length() < 4 || password.length() > 20) {
+            _passwordText.setError("between 4 and 20 alphanumeric characters");
             valid = false;
         } else {
             _passwordText.setError(null);
