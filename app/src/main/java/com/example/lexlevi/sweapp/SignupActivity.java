@@ -2,9 +2,11 @@ package com.example.lexlevi.sweapp;
 
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,10 @@ import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import retrofit2.*;
 
@@ -39,6 +45,11 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
 
+    private ArrayList<Course> courseList = null;
+    private HashMap<Integer, Course> selectedCourses = null;
+    private String selectedMajor = "";
+    private String selectedYear = "";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +57,29 @@ public class SignupActivity extends AppCompatActivity {
         setTitle(" ");
         ButterKnife.inject(this);
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URLs.BASE_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        // Get all courses
+        selectedCourses = new HashMap<Integer, Course>();
+        courseList = new ArrayList<Course>();
+        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
+        Call<List<Course>> call = chatServerAPI.getAllCourses();
+        call.enqueue(new Callback<List<Course>>() {
+            @Override
+            public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
+                for(Course c : response.body()) {
+                    courseList.add(c);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Course>> call, Throwable t) {
+
+            }
+        });
+        // Set up major select
         _selectMajor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,7 +90,7 @@ public class SignupActivity extends AppCompatActivity {
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
                         .setTitle("")
                         .setAdapter(arrayAdapter, null)
-                        .setNegativeButton(getResources().getString(android.R.string.cancel), null)
+                        .setPositiveButton(getResources().getString(android.R.string.ok), null)
                         .create();
 
                 dialog.getListView().setItemsCanFocus(false);
@@ -77,26 +111,18 @@ public class SignupActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-
+        // Set up course select
         _selectCourses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(SignupActivity.this, android.R.layout.select_dialog_singlechoice);
-                arrayAdapter.add("Foundations of CS");
-                arrayAdapter.add("Data Structures");
-                arrayAdapter.add("Discrete Math");
-                arrayAdapter.add("Analysis of Algorithms");
-                arrayAdapter.add("Operating Systems");
-                arrayAdapter.add("Principles of Software Engineering");
-                arrayAdapter.add("Intro to Databases");
-                arrayAdapter.add("Intro to C");
-                arrayAdapter.add("Intro to Internet Computing");
+                for(Course c : courseList) { arrayAdapter.add(c.getName()); }
 
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
                         .setTitle("")
                         .setAdapter(arrayAdapter, null)
-                        .setNegativeButton(getResources().getString(android.R.string.cancel), null)
+                        .setPositiveButton(getResources().getString(android.R.string.ok), null)
                         .create();
 
                 dialog.getListView().setItemsCanFocus(false);
@@ -108,9 +134,11 @@ public class SignupActivity extends AppCompatActivity {
                         System.out.println("clicked" + position);
                         CheckedTextView textView = (CheckedTextView) view;
                         if(textView.isChecked()) {
-
+                            if (selectedCourses.get(position) == null) {
+                                selectedCourses.put(position, courseList.get(position));
+                            }
                         } else {
-
+                            selectedCourses.remove(position);
                         }
                     }
                 });
@@ -130,7 +158,7 @@ public class SignupActivity extends AppCompatActivity {
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
                         .setTitle("")
                         .setAdapter(arrayAdapter, null)
-                        .setNegativeButton(getResources().getString(android.R.string.cancel), null)
+                        .setPositiveButton(getResources().getString(android.R.string.ok), null)
                         .create();
 
                 dialog.getListView().setItemsCanFocus(false);
@@ -191,6 +219,8 @@ public class SignupActivity extends AppCompatActivity {
         user.setEmail(email);
         user.setUserName(name);
         user.setPassword(password);
+        ArrayList<Course> selectedCourseList = new ArrayList<>(selectedCourses.values());
+        user.setCourses(selectedCourseList);
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
         Call<User> call = chatServerAPI.createUser(user);
         progressDialog.show();

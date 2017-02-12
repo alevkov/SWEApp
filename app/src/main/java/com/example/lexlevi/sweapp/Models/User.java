@@ -38,7 +38,7 @@ public class User {
     private List<String> days = null;
     @SerializedName("courses")
     @Expose
-    private List<Object> courses = null;
+    private List<Course> courses = null;
     @SerializedName("groups")
     @Expose
     private List<Object> groups = null;
@@ -123,11 +123,11 @@ public class User {
         this.days = days;
     }
 
-    public List<Object> getCourses() {
+    public List<Course> getCourses() {
         return courses;
     }
 
-    public void setCourses(List<Object> courses) {
+    public void setCourses(List<Course> courses) {
         this.courses = courses;
     }
 
