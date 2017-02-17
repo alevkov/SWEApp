@@ -6,6 +6,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class User {
 
+    @SerializedName("semester")
+    @Expose
+    private String semester;
+    @SerializedName("academicYear")
+    @Expose
+    private String academicYear;
     @SerializedName("year")
     @Expose
     private String year;
@@ -42,6 +48,22 @@ public class User {
     @SerializedName("groups")
     @Expose
     private List<Object> groups = null;
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
+
+    public String getAcademicYear() {
+        return academicYear;
+    }
+
+    public void setAcademicYear(String academicYear) {
+        this.academicYear = academicYear;
+    }
 
     public String getYear() {
         return year;

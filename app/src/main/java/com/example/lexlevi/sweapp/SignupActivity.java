@@ -1,6 +1,7 @@
 package com.example.lexlevi.sweapp;
 
 import com.example.lexlevi.sweapp.Common.URLs;
+import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
@@ -14,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,9 +24,12 @@ import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.CheckedTextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.*;
 
@@ -42,6 +47,7 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.select_major) TextView _selectMajor;
     @InjectView(R.id.select_courses) TextView _selectCourses;
     @InjectView(R.id.select_year) TextView _selectYear;
+    @InjectView(R.id.select_semester) TextView _selectSemester;
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
 
@@ -49,6 +55,7 @@ public class SignupActivity extends AppCompatActivity {
     private HashMap<Integer, Course> selectedCourses = null;
     private String selectedMajor = "";
     private String selectedYear = "";
+    private String selectedSemester = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,31 +90,23 @@ public class SignupActivity extends AppCompatActivity {
         _selectMajor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(SignupActivity.this, android.R.layout.select_dialog_singlechoice);
-                arrayAdapter.add("Computer Science");
-                arrayAdapter.add("Computer Engineering");
-
+                int checked = -1;
+                final CharSequence[] cs = new CharSequence[Constants.majors.length];
+                for(int i = 0; i < cs.length; i++) {
+                    if(Constants.majors[i] == selectedMajor) checked = i;
+                    cs[i] = Constants.majors[i];
+                }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
                         .setTitle("")
-                        .setAdapter(arrayAdapter, null)
-                        .setPositiveButton(getResources().getString(android.R.string.ok), null)
+                        .setPositiveButton("Done", null)
+                        .setSingleChoiceItems(cs, checked, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedMajor = (String) cs[which];
+                            }
+                        })
                         .create();
-
-                dialog.getListView().setItemsCanFocus(false);
                 dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view,
-                                            int position, long id) {
-                        System.out.println("clicked" + position);
-                        CheckedTextView textView = (CheckedTextView) view;
-                        if(textView.isChecked()) {
-
-                        } else {
-
-                        }
-                    }
-                });
                 dialog.show();
             }
         });
@@ -115,33 +114,31 @@ public class SignupActivity extends AppCompatActivity {
         _selectCourses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(SignupActivity.this, android.R.layout.select_dialog_singlechoice);
-                for(Course c : courseList) { arrayAdapter.add(c.getName()); }
-
+                CharSequence[] cs = new CharSequence[courseList.size()];
+                for(int i = 0; i < courseList.size(); i++) {
+                    cs[i] = courseList.get(i).getName();
+                }
+                boolean[] checkedItems = new boolean[cs.length];
+                for(Map.Entry<Integer, Course> entry: selectedCourses.entrySet()) {
+                    checkedItems[entry.getKey()] = true;
+                }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
                         .setTitle("")
-                        .setAdapter(arrayAdapter, null)
-                        .setPositiveButton(getResources().getString(android.R.string.ok), null)
-                        .create();
-
-                dialog.getListView().setItemsCanFocus(false);
-                dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-                dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view,
-                                            int position, long id) {
-                        System.out.println("clicked" + position);
-                        CheckedTextView textView = (CheckedTextView) view;
-                        if(textView.isChecked()) {
-                            if (selectedCourses.get(position) == null) {
-                                selectedCourses.put(position, courseList.get(position));
+                        .setPositiveButton("Done", null)
+                        .setMultiChoiceItems(cs, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                if(isChecked) {
+                                    if (selectedCourses.get(which) == null) {
+                                        selectedCourses.put(which, courseList.get(which));
+                                    }
+                                } else {
+                                    selectedCourses.remove(which);
+                                }
                             }
-                        } else {
-                            selectedCourses.remove(position);
-                        }
-                    }
-                });
+                        })
+                        .create();
+                dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
                 dialog.show();
             }
         });
@@ -149,33 +146,47 @@ public class SignupActivity extends AppCompatActivity {
         _selectYear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(SignupActivity.this, android.R.layout.select_dialog_singlechoice);
-                arrayAdapter.add("Freshman");
-                arrayAdapter.add("Sophomore");
-                arrayAdapter.add("Junior");
-                arrayAdapter.add("Senior");
-
+                int checked = -1;
+                final CharSequence[] cs = new CharSequence[Constants.years.length];
+                for(int i = 0; i < cs.length; i++) {
+                    if(Constants.years[i] == selectedYear) checked = i;
+                    cs[i] = Constants.years[i];
+                }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
                         .setTitle("")
-                        .setAdapter(arrayAdapter, null)
-                        .setPositiveButton(getResources().getString(android.R.string.ok), null)
+                        .setPositiveButton("Done", null)
+                        .setSingleChoiceItems(cs, checked, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedYear = (String) cs[which];
+                            }
+                        })
                         .create();
-
-                dialog.getListView().setItemsCanFocus(false);
                 dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                dialog.getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view,
-                                            int position, long id) {
-                        System.out.println("clicked" + position);
-                        CheckedTextView textView = (CheckedTextView) view;
-                        if(textView.isChecked()) {
+                dialog.show();
+            }
+        });
 
-                        } else {
-
-                        }
-                    }
-                });
+        _selectSemester.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checked = -1;
+                final CharSequence[] cs = new CharSequence[Constants.semesters.length];
+                for(int i = 0; i < cs.length; i++) {
+                    if(Constants.semesters[i] == selectedSemester) checked = i;
+                    cs[i] = Constants.semesters[i];
+                }
+                final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
+                        .setTitle("")
+                        .setPositiveButton("Done", null)
+                        .setSingleChoiceItems(cs, checked, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedSemester = (String) cs[which];
+                            }
+                        })
+                        .create();
+                dialog.getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                 dialog.show();
             }
         });
@@ -216,11 +227,18 @@ public class SignupActivity extends AppCompatActivity {
         String name = _usernameText.getText().toString();
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
+        String first = _firstnameText.getText().toString();
+        String last = _lastnameText.getText().toString();
         user.setEmail(email);
         user.setUserName(name);
         user.setPassword(password);
+        user.setFirstName(first);
+        user.setLastName(last);
         ArrayList<Course> selectedCourseList = new ArrayList<>(selectedCourses.values());
         user.setCourses(selectedCourseList);
+        user.setMajor(selectedMajor);
+        user.setYear(selectedYear);
+        user.setSemester(selectedSemester);
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
         Call<User> call = chatServerAPI.createUser(user);
         progressDialog.show();
