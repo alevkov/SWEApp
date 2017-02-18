@@ -3,7 +3,7 @@ package com.example.lexlevi.sweapp.Common;
 public class URLs {
 
     // Base
-    public static final String BASE_API = "http://192.168.1.112:3000/";
+    public static final String BASE_API = "http://10.12.101.58:3000/";
 
     // User Endpoints
     public static final String kGetUsers = "users";
