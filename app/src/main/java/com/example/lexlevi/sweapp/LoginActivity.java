@@ -1,5 +1,6 @@
 package com.example.lexlevi.sweapp;
 
+import android.content.Intent;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -19,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,43 +31,49 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.lexlevi.sweapp.Common.URLs;
+import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.net.*;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
     private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
-    // UI references.
+    // UI references
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket(URLs.BASE_API);
+        } catch (URISyntaxException e) {}
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setTitle(" ");
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -82,6 +90,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        mSocket.connect();
+
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -90,7 +100,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mRegisterButton = (Button) findViewById(R.id.register_button);
+        TextView mRegisterButton = (TextView) findViewById(R.id.action_register);
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -132,9 +142,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return false;
     }
 
-    /**
-     * Callback received when a permissions request has been completed.
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -145,12 +152,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
         if (mAuthTask != null) {
             return;
@@ -199,27 +200,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            mEmailView.setError("enter a valid email address");
+            return false;
+        } else {
+            mEmailView.setError(null);
+            return true;
+        }
+
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+        if (password.isEmpty() || password.length() < 4 || password.length() > 20) {
+            mPasswordView.setError("between 4 and 20 alphanumeric characters");
+            return false;
+        } else {
+            mPasswordView.setError(null);
+            return true;
+        }
     }
-
-    /**
-     * Takes the user to the registration activity
-     */
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void goToRegistration() {
-        //..
+        Intent intent = new Intent(this, SignupActivity.class);
+        startActivity(intent);
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
@@ -304,13 +310,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
 
         int ADDRESS = 0;
-        int IS_PRIMARY = 1;
     }
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
@@ -324,37 +325,46 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(URLs.BASE_API)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+            User user = new User();
+            user.setEmail(mEmail);
+            user.setPassword(mPassword);
+            ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
+            Call<User> call = chatServerAPI.loginUser(user);
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    showProgress(false);
+                    switch (response.code()) {
+                        case 200:
+                            UserSession.getInstance().setCurrentUser(response.body());
+                            break;
+                        case 404:
+                            mEmailView.setError(getString(R.string.error_user_nonexist));
+                            mEmailView.requestFocus();
+                            break;
+                        case 403:
+                            mPasswordView.setError(getString(R.string.error_incorrect_password));
+                            mPasswordView.requestFocus();
+                            break;
+                    }
                 }
-            }
 
-            // TODO: register the new account here.
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    showProgress(false);
+                    Log.d("Error: ", t.toString());
+                }
+            });
             return true;
         }
 
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
-            showProgress(false);
-
-            if (success) {
-                finish();
-            } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
-            }
         }
 
         @Override
@@ -364,4 +374,3 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 }
-
