@@ -1,6 +1,7 @@
 package com.example.lexlevi.sweapp.Controllers;
 
 import com.example.lexlevi.sweapp.Models.Course;
+import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Common.URLs;
 
@@ -14,7 +15,6 @@ public interface ChatServerAPI {
     // Users
     @POST(URLs.kUserSignup)
     Call<User> createUser(@Body User user);
-
     @POST(URLs.kUserLogin)
     Call<User> loginUser(@Body User user);
 
@@ -23,6 +23,14 @@ public interface ChatServerAPI {
     Call<List<Course>> getAllCourses();
 
     // Groups
-    @GET("group/{id}/users")
-    Call<List<User>> groupList(@Path("id") int groupId, @Query("sort") String sort);
+    @GET(URLs.kGetAllUsersForGroup)
+    Call<List<User>> groupUsersList(@Path("id") int groupId);
+    @GET(URLs.kGetAllGroupsForCourse)
+    Call<List<Group>> groupListForCourse(@Path("code") String courseCode,
+                                         @Query("semester") String courseSemester,
+                                         @Query("academicYear") int courseYear);
+    @GET(URLs.kGetAllGroupsForUser)
+    Call<List<Group>> groupListForUser(@Path("id") int userId);
+    @POST(URLs.kCreateGroupForUser)
+    Call<Group> createGroupForUser(@Path("id") int userId);
 }
