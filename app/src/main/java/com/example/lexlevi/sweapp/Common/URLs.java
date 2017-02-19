@@ -10,6 +10,12 @@ public class URLs {
     public static final String kUserLogin = "users/login";
     public static final String kUserSignup = "users/new";
 
-    // Courses Endpoints
+    // Course Endpoints
     public static final String kGetCourses = "courses";
+
+    // Group Endpoints
+    public static final String kGetAllUsersForGroup = "groups/{id}/users";
+    public static final String kGetAllGroupsForCourse = "groups/course/{code}";
+    public static final String kGetAllGroupsForUser = "groups/user/{id}";
+    public static final String kCreateGroupForUser = "groups/user/{id}";
 }
