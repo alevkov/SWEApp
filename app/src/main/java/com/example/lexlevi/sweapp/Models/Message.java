@@ -14,10 +14,10 @@ public class Message {
     private String body;
     @SerializedName("author")
     @Expose
-    private Object author;
+    private String author; // id
     @SerializedName("chat")
     @Expose
-    private Object chat;
+    private String chat; // id
     @SerializedName("updatedAt")
     @Expose
     private Date updatedAt;
@@ -25,11 +25,11 @@ public class Message {
     @Expose
     private Date createdAt;
 
-    public Object getChat() {
+    public String getChat() {
         return chat;
     }
 
-    public void setChat(Object chat) {
+    public void setChat(String chat) {
         this.chat = chat;
     }
 
@@ -49,11 +49,11 @@ public class Message {
         this.updatedAt = updatedAt;
     }
 
-    public Object getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(Object author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
 

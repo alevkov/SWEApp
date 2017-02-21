@@ -13,10 +13,10 @@ public class Chat {
     private String name;
     @SerializedName("participants")
     @Expose
-    private List<Object> participants = null;
+    private List<String> participants = null; // id
     @SerializedName("group")
     @Expose
-    private Object group;
+    private String group; // id
     @SerializedName("isGroupMessage")
     @Expose
     private Boolean isGroupMessage;
@@ -29,11 +29,11 @@ public class Chat {
         this.isGroupMessage = isGroupMessage;
     }
 
-    public List<Object> getParticipants() {
+    public List<String> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Object> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
 
@@ -49,7 +49,7 @@ public class Chat {
         return group;
     }
 
-    public void setGroup(Object group) {
+    public void setGroup(String group) {
         this.group = group;
     }
 
