@@ -19,8 +19,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,6 +32,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
@@ -356,6 +359,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
                     showProgress(false);
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            Html.fromHtml("<font color='#FFFFFF' >" + "Oops! Something went wrong." + "</font>"),
+                            Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.TOP, 0, 0);
+                    toast.show();
                     Log.d("Error: ", t.toString());
                 }
             });
