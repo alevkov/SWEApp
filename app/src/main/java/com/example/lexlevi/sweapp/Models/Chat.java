@@ -45,7 +45,7 @@ public class Chat {
         this.name = name;
     }
 
-    public Object getGroup() {
+    public String getGroup() {
         return group;
     }
 

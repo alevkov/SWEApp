@@ -14,7 +14,7 @@ public class Message {
     private String body;
     @SerializedName("author")
     @Expose
-    private String author; // id
+    private Object author; // id or {id, firstName, lastName, userName}
     @SerializedName("chat")
     @Expose
     private String chat; // id
@@ -49,11 +49,11 @@ public class Message {
         this.updatedAt = updatedAt;
     }
 
-    public String getAuthor() {
+    public Object getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(Object author) {
         this.author = author;
     }
 
