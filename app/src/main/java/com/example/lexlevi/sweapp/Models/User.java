@@ -18,7 +18,7 @@ public class User {
     @SerializedName("major")
     @Expose
     private String major;
-    @SerializedName("contrubution")
+    @SerializedName("contribution")
     @Expose
     private Integer contribution;
     @SerializedName("email")
@@ -47,7 +47,7 @@ public class User {
     private List<Course> courses = null;
     @SerializedName("groups")
     @Expose
-    private List<Object> groups = null;
+    private List<String> groups = null; // id
 
     public String getSemester() {
         return semester;
@@ -153,9 +153,9 @@ public class User {
         this.courses = courses;
     }
 
-    public List<Object> getGroups() { return groups; }
+    public List<String> getGroups() { return groups; }
 
-    public void setGroups(List<Object> groups) {
+    public void setGroups(List<String> groups) {
         this.groups = groups;
     }
 

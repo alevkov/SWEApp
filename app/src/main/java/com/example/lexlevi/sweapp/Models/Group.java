@@ -5,21 +5,25 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Group {
+
+    @SerializedName("_id")
+    @Expose
+    private String id;
     @SerializedName("name")
     @Expose
     private String name;
     @SerializedName("participants")
     @Expose
-    private List<Object> participants = null;
+    private List<String> participants = null; // id
     @SerializedName("creator")
     @Expose
-    private Object creator;
+    private String creator; // id
     @SerializedName("courses")
     @Expose
     private List<Course> courses = null;
     @SerializedName("chats")
     @Expose
-    private List<Object> chats = null;
+    private List<String> chats = null; // id
     @SerializedName("semester")
     @Expose
     private String semester;
@@ -57,11 +61,11 @@ public class Group {
         this.isPrivate = isPrivate;
     }
 
-    public List<Object> getChats() {
+    public List<String> getChats() {
         return chats;
     }
 
-    public void setMajor(List<Object> chats) {
+    public void setMajor(List<String> chats) {
         this.chats = chats;
     }
 
@@ -73,19 +77,19 @@ public class Group {
         this.courses = courses;
     }
 
-    public Object getCreator() {
+    public String getCreator() {
         return creator;
     }
 
-    public void setCreator(Object creator) {
+    public void setCreator(String creator) {
         this.creator = creator;
     }
 
-    public List<Object> getParticipants() {
+    public List<String> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Object> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
 
@@ -103,5 +107,13 @@ public class Group {
 
     public void setDays(List<String> days) {
         this.days = days;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
