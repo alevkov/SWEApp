@@ -5,6 +5,7 @@ import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -50,6 +51,7 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.select_semester) TextView _selectSemester;
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
+    @InjectView(R.id.avi) AVLoadingIndicatorView _avi;
 
     private ArrayList<Course> courseList = null;
     private HashMap<Integer, Course> selectedCourses = null;
@@ -69,6 +71,8 @@ public class SignupActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         // Get all courses
+        _avi.show();
+        _selectCourses.setEnabled(false);
         selectedCourses = new HashMap<Integer, Course>();
         courseList = new ArrayList<Course>();
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
@@ -79,11 +83,14 @@ public class SignupActivity extends AppCompatActivity {
                 for(Course c : response.body()) {
                     courseList.add(c);
                 }
+                _avi.hide();
+                _selectCourses.setEnabled(true);
             }
 
             @Override
             public void onFailure(Call<List<Course>> call, Throwable t) {
                 Log.d("Error:", "Couldn't load courses: " + t.toString());
+                _avi.hide();
             }
         });
         // Set up major select
