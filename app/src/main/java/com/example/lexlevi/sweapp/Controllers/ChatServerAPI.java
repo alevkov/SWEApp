@@ -41,7 +41,8 @@ public interface ChatServerAPI {
     @GET(URLs.kGetAllGroupsForUser)
     Call<List<Group>> getGroupListForUser(@Path("id") String userId);
     @POST(URLs.kCreateGroupForUser)
-    Call<Group> createGroupForUser(@Path("id") String userId);
+    Call<Group> createGroupForUser(@Path("id") String userId,
+                                   @Body Group group);
 
     // Chats + Messages
     @GET(URLs.kGetChatForId)

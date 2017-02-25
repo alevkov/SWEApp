@@ -11,7 +11,7 @@ public class User {
     private String semester;
     @SerializedName("academicYear")
     @Expose
-    private String academicYear;
+    private Integer academicYear;
     @SerializedName("year")
     @Expose
     private String year;
@@ -57,11 +57,11 @@ public class User {
         this.semester = semester;
     }
 
-    public String getAcademicYear() {
+    public Integer getAcademicYear() {
         return academicYear;
     }
 
-    public void setAcademicYear(String academicYear) {
+    public void setAcademicYear(Integer academicYear) {
         this.academicYear = academicYear;
     }
 

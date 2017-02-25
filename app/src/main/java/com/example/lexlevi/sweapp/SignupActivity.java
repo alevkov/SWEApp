@@ -11,6 +11,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ListView;
@@ -52,6 +54,7 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.btn_signup) Button _signupButton;
     @InjectView(R.id.link_login) TextView _loginLink;
     @InjectView(R.id.avi) AVLoadingIndicatorView _avi;
+    @InjectView(R.id.sign_up_form) ScrollView _signUpForm;
 
     private ArrayList<Course> courseList = null;
     private HashMap<Integer, Course> selectedCourses = null;
@@ -78,6 +81,7 @@ public class SignupActivity extends AppCompatActivity {
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
         Call<List<Course>> call = chatServerAPI.getAllCourses();
         call.enqueue(new Callback<List<Course>>() {
+            Snackbar s;
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 for(Course c : response.body()) {
@@ -89,7 +93,12 @@ public class SignupActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Course>> call, Throwable t) {
-                Log.d("Error:", "Couldn't load courses: " + t.toString());
+                Log.d("Error:", R.string.error_courses_load + t.toString());
+                s = Snackbar.make(_signUpForm,
+                        R.string.error_courses_load,
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources().getColor(R.color.excitedColor));
+                s.show();
                 _avi.hide();
             }
         });
