@@ -9,6 +9,7 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -253,6 +254,8 @@ public class SignupActivity extends AppCompatActivity {
              @Override
              public void onResponse(Call<User> call, Response<User> response) {
                  progressDialog.hide();
+                 Intent intent = new Intent(SignupActivity.this, DashboardActivity.class);
+                 startActivity(intent);
              }
 
              @Override
