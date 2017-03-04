@@ -18,6 +18,9 @@ public class Group {
     @SerializedName("creator")
     @Expose
     private String creator; // id
+    @SerializedName("desc")
+    @Expose
+    private String desc;
     @SerializedName("courses")
     @Expose
     private List<Course> courses = null;
@@ -51,6 +54,14 @@ public class Group {
 
     public void setAcademicYear(Integer academicYear) {
         this.academicYear = academicYear;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 
     public Boolean getIsPrivate() {

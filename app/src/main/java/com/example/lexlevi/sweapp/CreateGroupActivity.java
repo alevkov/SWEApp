@@ -135,7 +135,7 @@ public class CreateGroupActivity extends AppCompatActivity {
         group.setIsPrivate(_isPrivate.isChecked());
         group.setAcademicYear(UserSession.getInstance().getCurrentUser().getAcademicYear());
         group.setSemester(UserSession.getInstance().getCurrentUser().getSemester());
-
+        group.setDesc(_groupDescription.getText().toString());
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
         Call<Group> call = chatServerAPI.createGroupForUser(UserSession.getInstance()
                 .getCurrentUser()
