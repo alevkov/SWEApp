@@ -29,6 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -63,6 +64,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private AVLoadingIndicatorView _avi;
     private Button _emailSignInButton;
     private TextView _registerButton;
+    private ScrollView _loginForm;
 
     private Socket _socket;
     {
@@ -80,6 +82,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Set up the login form.
         _emailView = (AutoCompleteTextView) findViewById(R.id.email);
         _avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
+        _loginForm = (ScrollView) findViewById(R.id.login_form);
         _avi.hide();
         populateAutoComplete();
 
@@ -324,17 +327,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
                     showProgress(false);
+                    Snackbar s;
                     switch (response.code()) {
                         case 200:
                             UserSession.getInstance().setCurrentUser(response.body());
+                            Intent intent = new Intent(LoginActivity.this,
+                                                        CreateGroupActivity.class);
+                            startActivity(intent);
                             break;
                         case 404:
-                            _emailView.setError(getString(R.string.error_user_nonexist));
-                            _emailView.requestFocus();
+                            s = Snackbar.make(_loginForm,
+                                    R.string.error_user_nonexist,
+                                    Snackbar.LENGTH_LONG);
+                            s.getView().setBackgroundColor(getResources()
+                                                            .getColor(R.color.excitedColor));
+                            s.show();
                             break;
                         case 403:
-                            _passwordView.setError(getString(R.string.error_incorrect_password));
-                            _passwordView.requestFocus();
+                            s = Snackbar.make(_loginForm,
+                                    R.string.error_incorrect_password,
+                                    Snackbar.LENGTH_LONG);
+                            s.getView().setBackgroundColor(getResources()
+                                                            .getColor(R.color.excitedColor));
+                            s.show();
                             break;
                     }
                 }
@@ -342,12 +357,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onFailure(Call<User> call, Throwable t) {
                     showProgress(false);
-                    Toast toast = Toast.makeText(getApplicationContext(),
-                            Html.fromHtml("<font color='#FFFFFF' >" + "Oops! Something went wrong." + "</font>"),
-                            Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.TOP, 0, 0);
-                    toast.show();
-                    Log.d("Error: ", t.toString());
+                    Snackbar s;
+                    s = Snackbar.make(_loginForm,
+                            R.string.error_oops,
+                            Snackbar.LENGTH_LONG);
+                    s.getView().setBackgroundColor(getResources()
+                            .getColor(R.color.excitedColor));
+                    s.show();
                 }
             });
             return true;

@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:id="@+id/sign_up_form"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true">
 
@@ -89,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="16dp">
             <EditText android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,7 +103,7 @@
         <TextView android:id="@+id/select_major"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="30dp"
             android:text="Select Major"
             android:gravity="center"
             android:textSize="18dip"
@@ -112,7 +113,7 @@
         <TextView android:id="@+id/select_courses"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="30dp"
             android:text="Select Current Courses"
             android:gravity="center"
             android:textSize="18dip"
@@ -122,30 +123,29 @@
         <TextView android:id="@+id/select_year"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="30dp"
             android:text="Select Year"
             android:gravity="center"
             android:textSize="18dip"
             android:textColor="@color/textColor"/>
 
-        <!-- Select Year Label -->
+        <!-- Select Semester Label -->
         <TextView android:id="@+id/select_semester"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="30dp"
             android:text="Select Semester"
             android:gravity="center"
             android:textSize="18dip"
             android:textColor="@color/textColor"/>
 
-        <!-- Signup Button -->
-        <android.support.v7.widget.AppCompatButton
+        <Button
             android:id="@+id/btn_signup"
-            android:layout_width="fill_parent"
-            android:layout_height="45dp"
-            android:layout_marginTop="24dp"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="24dp"
-            android:padding="12dp"
             android:textColor="@color/textColor"
             android:background="@color/colorAccent"
             android:text="Create Account"/>

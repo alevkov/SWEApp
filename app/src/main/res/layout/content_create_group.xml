@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/create_group"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.lexlevi.sweapp.CreateGroupActivity"
+    tools:showIn="@layout/activity_create_group">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginLeft="24dp"
+            android:text="Private"
+            android:thumbTextPadding="16dp"
+            android:id="@+id/private_switch"/>
+
+        <com.jaredrummler.materialspinner.MaterialSpinner
+            android:id="@+id/courses_spinner"
+            android:layout_width="match_parent"
+            android:layout_marginTop="24dp"
+            android:layout_height="wrap_content"
+            android:text="Select Courses"/>
+
+
+        <!-- Select Courses Label -->
+        <TextView android:id="@+id/days_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginLeft="24dp"
+            android:text="Select Days"
+            android:textSize="14dip"
+            android:textColor="@color/colorPrimary"/>
+
+        <com.wang.avi.AVLoadingIndicatorView android:id="@+id/create_group_avi"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            style="@style/AVLoadingIndicatorView"
+            android:layout_gravity="center_horizontal"
+            app:indicatorName="BallTrianglePathIndicator"
+            app:indicatorColor="@color/excitedColor" />
+
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>

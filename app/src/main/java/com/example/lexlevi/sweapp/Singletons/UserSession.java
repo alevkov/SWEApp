@@ -22,6 +22,10 @@ public class UserSession {
         return currentUser;
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
     private boolean isUserInSession() {
         return instance != null;
     }
