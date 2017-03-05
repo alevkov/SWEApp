@@ -332,7 +332,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         case 200:
                             UserSession.getInstance().setCurrentUser(response.body());
                             Intent intent = new Intent(LoginActivity.this,
-                                                        CreateGroupActivity.class);
+                                                        DashboardActivity.class);
                             startActivity(intent);
                             break;
                         case 404:

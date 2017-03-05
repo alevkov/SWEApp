@@ -1,0 +1,31 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="@dimen/cell_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/colorPrimary"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:descendantFocusability="beforeDescendants"
+    tools:context="layout.DashboardGroups">
+
+        <GridView
+            android:id="@+id/group_gridview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:columnWidth="100dp"
+            android:minHeight="100dp"
+            android:numColumns="auto_fit"
+            android:verticalSpacing="64dp"
+            android:horizontalSpacing="0dp"
+            android:stretchMode="spacingWidthUniform"
+            android:paddingBottom="0dip"
+            android:focusable="true"
+            android:fitsSystemWindows="true" />
+
+</LinearLayout>

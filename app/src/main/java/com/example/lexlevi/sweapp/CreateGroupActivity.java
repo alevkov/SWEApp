@@ -1,7 +1,6 @@
 package com.example.lexlevi.sweapp;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -21,10 +20,8 @@ import com.wang.avi.AVLoadingIndicatorView;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -46,7 +43,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     @InjectView(R.id.group_description) EditText _groupDescription;
     @InjectView(R.id.create_group_avi) AVLoadingIndicatorView _avi;
 
-    List<Course> selectedCourse;
+    List<Course> _selectedCourse;
     List<String> _days;
     boolean[] _selectedDays = new boolean[Constants.days.length];
     @Override
@@ -56,16 +53,16 @@ public class CreateGroupActivity extends AppCompatActivity {
         ButterKnife.inject(this);
         setTitle("");
         showProgress(false);
-        selectedCourse = new ArrayList<>();
-        selectedCourse.add(UserSession.getInstance().getCurrentUser().getCourses().get(0));
+        _selectedCourse = new ArrayList<>();
+        _selectedCourse.add(UserSession.getInstance().getCurrentUser().getCourses().get(0));
         _days = new ArrayList<>();
 
         _coursesSpinner.setItems(UserSession.getInstance().getCurrentUser().getCourses());
         _coursesSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
-                selectedCourse = new ArrayList<Course>();
-                selectedCourse.add((Course) item);
+                _selectedCourse = new ArrayList<Course>();
+                _selectedCourse.add((Course) item);
             }
         });
 
@@ -126,7 +123,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 .build();
         Group group = new Group();
         group.setName(_groupName.getText().toString());
-        group.setCourses(selectedCourse);
+        group.setCourses(_selectedCourse);
         for (int i = 0; i < Constants.days.length; i++) {
             if (_selectedDays[i])
                 _days.add(Constants.days[i]);
