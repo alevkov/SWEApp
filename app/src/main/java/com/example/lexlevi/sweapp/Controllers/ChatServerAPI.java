@@ -51,12 +51,18 @@ public interface ChatServerAPI {
     Call<List<Chat>> getChatListForGroup(@Path("groupId") String groupId);
     @GET(URLs.kGetMessagesForChat)
     Call<List<Message>> getMessagesForChat(@Path("id") String id);
+    @GET(URLs.kGetUsersForChat)
+    Call<List<User>> getUsersForChat(@Path("id") String id);
     @Multipart
     @POST(URLs.kCreateNewChatForGroup)
     Call<Chat> createChatForGroup(@Part("user") User user,
                                   @Part("message") Message message,
                                   @Body Chat chat,
                                   @Path("groupId") String groupId);
+    @PATCH(URLs.kUpdateChatForId)
+    Call<Chat> updateChatForId(@Path("id") String id);
+    @DELETE(URLs.kDeleteChatForId)
+    Call<Chat> deleteChatForId(@Path("id") String id);
     @POST(URLs.kCreateNewMessageForChat)
     Call<Message> createNewMessageForChat(@Path("id") String chatId,
                                           @Body Message message);

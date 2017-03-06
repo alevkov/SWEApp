@@ -25,6 +25,9 @@ public class URLs {
     public static final String kGetChatForId = "chats/{id}";
     public static final String kGetChatsForGroup = "chats/group/{groupId}";
     public static final String kGetMessagesForChat = "chats/{id}/messages";
-    public static final String kCreateNewChatForGroup = "chats/group/{groupId}";
-    public static final String kCreateNewMessageForChat = "chats/{id}/message/new";
+    public static final String kGetUsersForChat = "chats/{id}/users";
+    public static final String kCreateNewChatForGroup = "chats/group/{groupId}/new";
+    public static final String kUpdateChatForId = "chats/{id}/update";
+    public static final String kDeleteChatForId = "chats/{id}/delete";
+    public static final String kCreateNewMessageForChat = "chats/{id}/messages/new";
 }
