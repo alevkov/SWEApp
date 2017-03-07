@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 public class ChatDetailActivity extends AppCompatActivity {
 
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

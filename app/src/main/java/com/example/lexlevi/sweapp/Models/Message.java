@@ -3,8 +3,10 @@ package com.example.lexlevi.sweapp.Models;
 import java.util.Date;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.stfalcon.chatkit.commons.models.IMessage;
+import com.stfalcon.chatkit.commons.models.IUser;
 
-public class Message {
+public class Message implements IMessage {
 
     @SerializedName("_id")
     @Expose
@@ -14,7 +16,7 @@ public class Message {
     private String body;
     @SerializedName("author")
     @Expose
-    private Object author; // id or {id, firstName, lastName, userName}
+    private User author; // id or {id, firstName, lastName, userName}
     @SerializedName("chat")
     @Expose
     private String chat; // id
@@ -49,11 +51,11 @@ public class Message {
         this.updatedAt = updatedAt;
     }
 
-    public Object getAuthor() {
+    public User getAuthor() {
         return author;
     }
 
-    public void setAuthor(Object author) {
+    public void setAuthor(User author) {
         this.author = author;
     }
 
@@ -71,5 +73,15 @@ public class Message {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public IUser getUser() {
+        return getAuthor();
+    }
+
+    @Override
+    public String getText() {
+        return this.getBody();
     }
 }

@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 
@@ -38,12 +39,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class ChatListActivity extends AppCompatActivity {
 
-    private boolean _twoPane;
+    private boolean _twoPane; // won't really be used
     public  Group _group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_chat_list);
         if (_group == null)
             _group = (Group) getIntent().getSerializableExtra(ChatDetailFragment.GROUP_ITEM);
@@ -56,13 +58,13 @@ public class ChatListActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //.. for creating new chat
             }
         });
 
         View recyclerView = findViewById(R.id.chat_list);
-        assert recyclerView != null;
+        recyclerView.setBottom(3);
+
         setupRecyclerView((RecyclerView) recyclerView);
 
         if (findViewById(R.id.chat_detail_container) != null) {
@@ -88,7 +90,6 @@ public class ChatListActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     public class ChatRecyclerViewAdapter
@@ -112,7 +113,6 @@ public class ChatListActivity extends AppCompatActivity {
             holder._chat = _chats.get(position);
             holder._idView.setText("#");
             holder._contentView.setText(_chats.get(position).getName());
-
             holder._view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

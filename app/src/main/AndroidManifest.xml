@@ -17,6 +17,7 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name">
+            android:windowSoftInputMode="adjustResize"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -43,6 +44,7 @@
             android:label="@string/title_chat_detail"
             android:parentActivityName=".ChatListActivity"
             android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustPan"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
