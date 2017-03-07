@@ -3,8 +3,9 @@ package com.example.lexlevi.sweapp.Models;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.stfalcon.chatkit.commons.models.IUser;
 
-public class User {
+public class User implements IUser {
 
     @SerializedName("semester")
     @Expose
@@ -159,4 +160,13 @@ public class User {
         this.groups = groups;
     }
 
+    @Override
+    public String getName() {
+        return this.userName;
+    }
+
+    @Override
+    public String getAvatar() {
+        return null;
+    }
 }

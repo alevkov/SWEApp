@@ -41,10 +41,6 @@ public class DashboardGroups extends Fragment {
 
     }
 
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
     public static DashboardGroups newInstance(int sectionNumber) {
         DashboardGroups fragment = new DashboardGroups();
         Bundle args = new Bundle();

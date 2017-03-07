@@ -1,5 +1,7 @@
 package com.example.lexlevi.sweapp.Adapters;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
@@ -9,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.lexlevi.sweapp.ChatDetailFragment;
+import com.example.lexlevi.sweapp.ChatListActivity;
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Group;
@@ -54,9 +58,7 @@ public class GroupAdapter extends BaseAdapter {
 
     // 5
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        final Group book = groups[position];
-
+    public View getView(final int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             convertView = layoutInflater.inflate(R.layout.linearlayout_group, null);
@@ -64,8 +66,17 @@ public class GroupAdapter extends BaseAdapter {
 
         final TextView nameTextView = (TextView)convertView.findViewById(R.id.textview_group_name);
         final ImageView imageViewFavorite = (ImageView)convertView.findViewById(R.id.imageview_favorite);
-        nameTextView.setText(book.toString());
-
+        nameTextView.setText(groups[position].toString());
+        nameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, ChatListActivity.class);
+                Bundle extras = new Bundle();
+                extras.putSerializable(ChatDetailFragment.GROUP_ITEM, groups[position]);
+                intent.putExtras(extras);
+                mContext.startActivity(intent);
+            }
+        });
         return convertView;
     }
 }

@@ -1,10 +1,11 @@
 package com.example.lexlevi.sweapp.Models;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Chat {
+public class Chat implements Serializable {
 
     @SerializedName("_id")
     @Expose
@@ -60,6 +61,11 @@ public class Chat {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
     }
 }
 
