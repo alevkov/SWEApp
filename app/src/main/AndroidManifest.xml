@@ -33,7 +33,21 @@
         <activity
             android:name=".DashboardActivity"
             android:label="@string/title_activity_dashboard"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ChatListActivity"
+            android:label="@string/title_chat_list"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".ChatDetailActivity"
+            android:label="@string/title_chat_detail"
+            android:parentActivityName=".ChatListActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.lexlevi.sweapp.ChatListActivity" />
+        </activity>
     </application>
 
 </manifest>

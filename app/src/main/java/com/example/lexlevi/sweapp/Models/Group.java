@@ -1,10 +1,11 @@
 package com.example.lexlevi.sweapp.Models;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Group {
+public class Group implements Serializable {
 
     @SerializedName("_id")
     @Expose
