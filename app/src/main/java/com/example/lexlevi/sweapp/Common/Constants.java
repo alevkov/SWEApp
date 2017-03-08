@@ -7,4 +7,8 @@ public final class Constants {
     public static final String[] semesters = {"Spring", "Summer", "Fall"};
     public static final String[] majors = {"Computer Science", "Computer Engineering"};
     public static final String[] days = {"Mon", "Tue", "Wen", "Thu", "Fri", "Sat", "Sun"};
+
+    // Sockets
+    public static final String sEventNewMessage = "newMessage";
+    public static final String sEventJoinChat = "enterChannel";
 }

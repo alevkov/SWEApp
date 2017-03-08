@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +19,7 @@ import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Group;
+import com.example.lexlevi.sweapp.Singletons.SocketConnector;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ public class ChatListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SocketConnector.getInstance().getSocket();
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_chat_list);

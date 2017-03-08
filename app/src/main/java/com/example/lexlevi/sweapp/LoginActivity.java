@@ -66,14 +66,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private TextView _registerButton;
     private ScrollView _loginForm;
 
-    private Socket _socket;
-    {
-        try {
-            _socket = IO.socket(URLs.BASE_API);
-        } catch (URISyntaxException e) {}
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +89,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
         });
-
-        _socket.connect();
 
         _emailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         _emailSignInButton.setOnClickListener(new OnClickListener() {

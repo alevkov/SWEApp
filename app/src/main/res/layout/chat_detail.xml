@@ -17,6 +17,8 @@
         android:id="@+id/messagesList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:incomingTextSize="14sp"
+        app:outcomingTextSize="14sp"
         android:layout_above="@+id/input">
 
     </com.stfalcon.chatkit.messages.MessagesList>
@@ -35,6 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
+        app:inputTextColor="@color/white60"
         app:inputHint="Enter a Message" />
 </RelativeLayout>
 

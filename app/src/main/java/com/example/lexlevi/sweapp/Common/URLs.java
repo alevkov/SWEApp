@@ -3,7 +3,9 @@ package com.example.lexlevi.sweapp.Common;
 public class URLs {
 
     // Base
-    public static final String BASE_API = "https://sweproj-uniteam.herokuapp.com/";
+    public static final String HEROKU = "https://sweproj-uniteam.herokuapp.com/";
+    public static final String LOCAL = "http://150.130.38.154:3000/";
+    public static final String BASE_API = LOCAL;
 
     // User Endpoints
     public static final String kGetUsers = "users";

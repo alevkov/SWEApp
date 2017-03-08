@@ -1,7 +1,5 @@
 package com.example.lexlevi.sweapp;
 
-import android.app.Activity;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,16 +7,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
+import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.Message;
+import com.example.lexlevi.sweapp.Singletons.SocketConnector;
 import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.Gson;
 import com.stfalcon.chatkit.messages.MessageInput;
 import com.stfalcon.chatkit.messages.MessagesList;
 import com.stfalcon.chatkit.messages.MessagesListAdapter;
@@ -34,12 +35,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-/**
- * A fragment representing a single Chat detail screen.
- * This fragment is either contained in a {@link ChatListActivity}
- * in two-pane mode (on tablets) or a {@link ChatDetailActivity}
- * on handsets.
- */
 public class ChatDetailFragment extends Fragment {
 
     public static final String CHAT_ITEM = "chat";
@@ -47,7 +42,7 @@ public class ChatDetailFragment extends Fragment {
 
     private Chat _chat;
     private Group _group;
-
+    private Socket _socket;
     private View _rView;
     private MessagesListAdapter<Message> _chatAdapter;
 
@@ -55,12 +50,19 @@ public class ChatDetailFragment extends Fragment {
 
     }
 
+    // Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments().containsKey(CHAT_ITEM)) {
             _chat = (Chat) getActivity().getIntent().getSerializableExtra(CHAT_ITEM);
             _group = (Group) getActivity().getIntent().getSerializableExtra(GROUP_ITEM);
+
+            _socket = SocketConnector.getInstance().getSocket();
+            _socket.on(Constants.sEventNewMessage, onNewMessage);
+            if (_socket.connected())
+                _socket.emit(Constants.sEventJoinChat, _chat.getId());
+
             CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity()
                     .findViewById(R.id.chat_detail_toolbar_layout);
             String expandTitle = " # " + _chat.getName();
@@ -79,6 +81,7 @@ public class ChatDetailFragment extends Fragment {
         return rootView;
     }
 
+    // View Setup
     public void setUpMessageView() {
         final AVLoadingIndicatorView messagesAvi = (AVLoadingIndicatorView) _rView.findViewById(R.id.avi_messages);
         messagesAvi.show();
@@ -116,10 +119,11 @@ public class ChatDetailFragment extends Fragment {
     public void setUpInputView() {
         final MessageInput inputView = (MessageInput) _rView.findViewById(R.id.input);
         inputView.setInputListener(new MessageInput.InputListener() {
+
             @Override
             public boolean onSubmit(CharSequence input) {
-                //validate and send message
                 Message m = new Message();
+                Gson g = new Gson();
                 m.setAuthor(UserSession
                 .getInstance()
                 .getCurrentUser());
@@ -127,9 +131,28 @@ public class ChatDetailFragment extends Fragment {
                 m.setChat(_chat.getId());
                 m.setCreatedAt(new Date());
                 m.setUpdatedAt(new Date());
-                _chatAdapter.addToStart(m, true);
+                _socket.emit(Constants.sEventNewMessage,
+                        _chat.getId(),
+                        g.toJson(m));
                 return true;
             }
         });
     }
+
+    // Socket Events
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+
+        @Override
+        public void call(final Object... args) {
+            if (getActivity() == null) return;
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Gson gson = new Gson();
+                    Message m = gson.fromJson((String) args[0], Message.class);
+                    _chatAdapter.addToStart(m, true);
+                }
+            });
+        }
+    };
 }
