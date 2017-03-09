@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Common.URLs;
@@ -44,6 +45,7 @@ public class ChatDetailFragment extends Fragment {
     private Group _group;
     private Socket _socket;
     private View _rView;
+    private TextView _noMessagesView;
     private MessagesListAdapter<Message> _chatAdapter;
 
     public ChatDetailFragment() {
@@ -74,7 +76,7 @@ public class ChatDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.chat_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_chat_detail, container, false);
         _rView = rootView;
         setUpMessageView();
         setUpInputView();
@@ -85,6 +87,9 @@ public class ChatDetailFragment extends Fragment {
     public void setUpMessageView() {
         final AVLoadingIndicatorView messagesAvi = (AVLoadingIndicatorView) _rView.findViewById(R.id.avi_messages);
         messagesAvi.show();
+        final TextView noMessages = (TextView) _rView.findViewById(R.id.text_no_messages);
+        _noMessagesView = noMessages;
+        noMessages.setVisibility(View.GONE);
         RelativeLayout messagesListContainer = (RelativeLayout) _rView.findViewById(R.id.message_list_container);
         final MessagesList messagesList = (MessagesList) messagesListContainer.findViewById(R.id.messagesList);
         final MessagesListAdapter<Message> adapter = new MessagesListAdapter<>(UserSession
@@ -103,11 +108,19 @@ public class ChatDetailFragment extends Fragment {
         call.enqueue(new Callback<List<Message>>() {
             @Override
             public void onResponse(Call<List<Message>> call, Response<List<Message>> response) {
-                Collections.reverse(response.body());
-                messagesAvi.hide();
-                adapter.addToEnd(response.body(), true);
-            }
+                switch (response.code()) {
+                    case 200:
+                        Collections.reverse(response.body());
+                        messagesAvi.hide();
+                        adapter.addToEnd(response.body(), true);
+                        break;
+                    case 404:
+                        noMessages.setVisibility(View.VISIBLE);
+                        messagesAvi.hide();
+                        break;
+                }
 
+            }
             @Override
             public void onFailure(Call<List<Message>> call, Throwable t) {
                 messagesAvi.hide();
@@ -148,6 +161,7 @@ public class ChatDetailFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    _noMessagesView.setVisibility(View.GONE);
                     Gson gson = new Gson();
                     Message m = gson.fromJson((String) args[0], Message.class);
                     _chatAdapter.addToStart(m, true);
