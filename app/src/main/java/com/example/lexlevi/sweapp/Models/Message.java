@@ -60,7 +60,7 @@ public class Message implements IMessage {
     }
 
     public String getBody() {
-        return "$ " + getAuthor().getName() +
+        return "@" + getAuthor().getName() +
                 System.getProperty("line.separator") +
                 System.getProperty("line.separator") +
                 body;
