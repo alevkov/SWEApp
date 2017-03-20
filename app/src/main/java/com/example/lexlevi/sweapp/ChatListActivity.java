@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter;
@@ -186,9 +187,16 @@ public class ChatListActivity extends AppCompatActivity {
             switch (section) {
                 case 0:
                     holder._title.setText("channels");
+                    holder._addPrivateChannel.setVisibility(View.GONE);
                     break;
                 case 1:
-                    holder._title.setText("private messaging");
+                    holder._title.setText("direct messaging");
+                    holder._addPrivateChannel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //..
+                        }
+                    });
                     break;
             }
         }
@@ -254,17 +262,21 @@ public class ChatListActivity extends AppCompatActivity {
 
         public class ChatListVH extends RecyclerView.ViewHolder {
             public final View _view;
+
             public final TextView _idView;
             public final TextView _contentView;
             public final TextView _title;
+            public final Button _addPrivateChannel;
+
             public Chat _chat;
 
             public ChatListVH(View view) {
                 super(view);
                 _view = view;
-                _idView = (TextView) view.findViewById(R.id.id);
-                _contentView = (TextView) view.findViewById(R.id.content);
+                _idView = (TextView) view.findViewById(R.id.chat_item_label);
+                _contentView = (TextView) view.findViewById(R.id.chat_item_content);
                 _title = (TextView) view.findViewById(R.id.chat_header_title);
+                _addPrivateChannel = (Button) view.findViewById(R.id.add_private_channel);
             }
 
             @Override
