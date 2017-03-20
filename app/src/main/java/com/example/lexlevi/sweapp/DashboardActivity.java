@@ -13,13 +13,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
-import android.widget.TextView;
 
 import com.example.lexlevi.sweapp.Singletons.UserSession;
 
@@ -41,7 +37,7 @@ public class DashboardActivity extends AppCompatActivity
         if(Build.VERSION.SDK_INT >= 21)
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         setSupportActionBar(toolbar);
-        setTitle("Uniteam");
+        setTitle("Welcome, " + UserSession.getInstance().getCurrentUser().getName());
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());

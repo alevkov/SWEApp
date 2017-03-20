@@ -303,7 +303,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(URLs.BASE_API)
                     .addConverterFactory(GsonConverterFactory.create())

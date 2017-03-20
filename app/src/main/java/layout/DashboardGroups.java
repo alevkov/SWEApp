@@ -1,34 +1,24 @@
 package layout;
 
-import android.os.Build;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.TextView;
 
 import com.example.lexlevi.sweapp.Adapters.GroupAdapter;
-import com.example.lexlevi.sweapp.Common.URLs;
-import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
-import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.Group;
-import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.R;
+import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
 import com.example.lexlevi.sweapp.Singletons.UserSession;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.InjectView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class DashboardGroups extends Fragment {
@@ -66,17 +56,14 @@ public class DashboardGroups extends Fragment {
 
     protected void loadGroups(final GridView view) {
         final ArrayList<Group> groups = new ArrayList<>();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLs.BASE_API)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
-        Call<List<Group>> call = chatServerAPI.getGroupListForUser(UserSession
+        Call<List<Group>> call = ChatServerClient
                 .getInstance()
-                .getCurrentUser()
-                .getId());
+                .api()
+                .getGroupListForUser(UserSession
+                    .getInstance()
+                    .getCurrentUser()
+                    .getId());
         call.enqueue(new Callback<List<Group>>() {
-            Snackbar s;
             @Override
             public void onResponse(Call<List<Group>> call, Response<List<Group>> response) {
                 if (response.body() != null) {

@@ -3,6 +3,7 @@ package com.example.lexlevi.sweapp.Singletons;
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 
@@ -27,8 +28,13 @@ public class SocketConnector {
     }
 
     public Socket getSocket() {
-        if (!_socket.connected())
+        if (!_socket.connected()) {
             connect();
+            Gson g = new Gson();
+            _socket.emit("userJoined",
+                    g.toJson(UserSession.getInstance().getCurrentUser()));
+        }
+
         return _socket;
     }
 
