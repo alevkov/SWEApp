@@ -45,7 +45,8 @@ public class ChatListActivity extends AppCompatActivity {
     private boolean _twoPane; // won't really be used2
     private Socket _socket;
 
-    public  Group _group;
+    public Group _group;
+    public List<User> _groupUsers;
 
 
     @Override
@@ -89,16 +90,16 @@ public class ChatListActivity extends AppCompatActivity {
                 .getInstance()
                 .api()
                 .getChatListForGroup(_group.getId());
-        callChats.enqueue(new Callback<List<Chat>>() {
+        callChats.enqueue(new Callback<List<Chat>>() { // call to load group chats
             @Override
             public void onResponse(Call<List<Chat>> call, final Response<List<Chat>> chatResponse) {
                 switch (chatResponse.code()) {
-                    case 200: // call to load users chained after loading chats
+                    case 200:
                         Call<List<User>> callUsers = ChatServerClient
                                 .getInstance()
                                 .api()
                                 .getGroupUsersList(_group.getId());
-                        callUsers.enqueue(new Callback<List<User>>() {
+                        callUsers.enqueue(new Callback<List<User>>() { // call to load users chained after loading chats
                             @Override
                             public void onResponse(Call<List<User>> call, Response<List<User>> userResponse) {
                                 switch (userResponse.code()) {
@@ -156,11 +157,11 @@ public class ChatListActivity extends AppCompatActivity {
             extends SectionedRecyclerViewAdapter<ChatRecyclerViewAdapter.ChatListVH> {
 
         private final List<Chat> _chats;
-        private final List<User> _users;
+        private final List<User> _directChannels;
 
-        public ChatRecyclerViewAdapter(List<Chat> items, List<User> users) {
-            _chats = items;
-            _users = users;
+        public ChatRecyclerViewAdapter(List<Chat> chats, List<User> users) {
+            _chats = chats;
+            _directChannels = users;
         }
 
         @Override
@@ -236,7 +237,7 @@ public class ChatListActivity extends AppCompatActivity {
                 case 1:
                     holder._chat = null;
                     holder._idView.setText("@");
-                    holder._contentView.setText(_users.get(relativePosition).getUserName());
+                    holder._contentView.setText(_directChannels.get(relativePosition).getUserName());
                     break;
                 default:
                     break;
@@ -254,7 +255,7 @@ public class ChatListActivity extends AppCompatActivity {
                 case 0:
                     return _chats.size();
                 case 1:
-                    return _users.size();
+                    return _directChannels.size();
                 default:
                     return 0;
             }
