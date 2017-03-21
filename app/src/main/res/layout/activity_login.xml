@@ -53,8 +53,7 @@
                     android:maxLines="1"
                     android:textColor="@color/textColor"
                     android:textColorHighlight="@color/hilightColor"
-                    android:textCursorDrawable="@null"
-                    android:singleLine="true" />
+                    android:textCursorDrawable="@null" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -74,8 +73,7 @@
                     android:maxLines="1"
                     android:textColor="@color/textColor"
                     android:textColorHighlight="@color/hilightColor"
-                    android:textCursorDrawable="@null"
-                    android:singleLine="true" />
+                    android:textCursorDrawable="@null" />
 
             </android.support.design.widget.TextInputLayout>
 

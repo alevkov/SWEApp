@@ -8,26 +8,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
-
-import com.example.lexlevi.sweapp.Common.URLs;
-import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter;
+import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Group;
+import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
+import com.example.lexlevi.sweapp.Singletons.SocketConnector;
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.Socket;
 
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * An activity representing a list of Chats. This activity
@@ -39,16 +42,26 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class ChatListActivity extends AppCompatActivity {
 
-    private boolean _twoPane; // won't really be used
-    public  Group _group;
+    private boolean _twoPane; // won't really be used2
+    private Socket _socket;
+
+    public Group _group;
+    public List<User> _groupUsers;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // set up socket events
+        _socket = SocketConnector.getInstance().getSocket();
+        _socket.on(Constants.sEvenUserJoin, onUserJoin);
+        _socket.on(Constants.sEventUpdateUsers, onUpdateUsers);
+        // get selected group
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_chat_list);
         if (_group == null)
             _group = (Group) getIntent().getSerializableExtra(ChatDetailFragment.GROUP_ITEM);
+        // view setup
         setTitle(_group.getName());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -73,90 +86,206 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLs.BASE_API)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
-        Call<List<Chat>> call = chatServerAPI.getChatListForGroup(_group.getId());
-        call.enqueue(new Callback<List<Chat>>() {
+        Call<List<Chat>> callChats = ChatServerClient
+                .getInstance()
+                .api()
+                .getChatListForGroup(_group.getId());
+        callChats.enqueue(new Callback<List<Chat>>() { // call to load group chats
             @Override
-            public void onResponse(Call<List<Chat>> call, Response<List<Chat>> response) {
-                recyclerView.setAdapter(new ChatRecyclerViewAdapter(response.body()));
+            public void onResponse(Call<List<Chat>> call, final Response<List<Chat>> chatResponse) {
+                switch (chatResponse.code()) {
+                    case 200:
+                        Call<List<User>> callUsers = ChatServerClient
+                                .getInstance()
+                                .api()
+                                .getGroupUsersList(_group.getId());
+                        callUsers.enqueue(new Callback<List<User>>() { // call to load users chained after loading chats
+                            @Override
+                            public void onResponse(Call<List<User>> call, Response<List<User>> userResponse) {
+                                switch (userResponse.code()) {
+                                    case 200:
+                                        recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse.body(),
+                                                userResponse.body()));
+                                        break;
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<List<User>> call, Throwable t) { // fail to load users
+                                Log.d("ERROR: ", t.toString());
+                            }
+                        });
+                        break;
+                    case 404:
+                        break;
+                }
             }
 
             @Override
-            public void onFailure(Call<List<Chat>> call, Throwable t) {
+            public void onFailure(Call<List<Chat>> call, Throwable t) { // fail to load chats
 
             }
         });
     }
 
-    public class ChatRecyclerViewAdapter
-            extends RecyclerView.Adapter<ChatRecyclerViewAdapter.ViewHolder> {
-
-        private final List<Chat> _chats;
-
-        public ChatRecyclerViewAdapter(List<Chat> items) {
-            _chats = items;
-        }
-
+    // Socket events
+    private Emitter.Listener onUserJoin = new Emitter.Listener() {
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.chat_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            holder._chat = _chats.get(position);
-            holder._idView.setText("#");
-            holder._contentView.setText(_chats.get(position).getName());
-            holder._view.setOnClickListener(new View.OnClickListener() {
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
                 @Override
-                public void onClick(View v) {
-                    if (_twoPane) {
-                        Bundle arguments = new Bundle();
-                        arguments.putSerializable(ChatDetailFragment.CHAT_ITEM, holder._chat);
-                        ChatDetailFragment fragment = new ChatDetailFragment();
-                        fragment.setArguments(arguments);
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.chat_detail_container, fragment)
-                                .commit();
-                    } else {
-                        Context context = v.getContext();
-                        Intent intent = new Intent(context, ChatDetailActivity.class);
-                        intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
-                        intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
-                        startActivity(intent);
-                    }
+                public void run() {
+                    Log.d("USER JOIN: ", args[0] + "just joined!");
                 }
             });
         }
+    };
 
+    private Emitter.Listener onUpdateUsers = new Emitter.Listener() {
         @Override
-        public int getItemCount() {
-            return _chats.size();
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("UPDATE USERS: ", args[0] + "");
+                }
+            });
+        }
+    };
+
+    // Adapter
+    public class ChatRecyclerViewAdapter
+            extends SectionedRecyclerViewAdapter<ChatRecyclerViewAdapter.ChatListVH> {
+
+        private final List<Chat> _chats;
+        private final List<User> _directChannels;
+
+        public ChatRecyclerViewAdapter(List<Chat> chats, List<User> users) {
+            _chats = chats;
+            _directChannels = users;
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        @Override
+        public ChatListVH onCreateViewHolder(ViewGroup parent, int viewType) {
+            int layout;
+            switch (viewType) {
+                case VIEW_TYPE_HEADER:
+                    layout = R.layout.chat_list_header;
+                    break;
+                case VIEW_TYPE_ITEM:
+                    layout = R.layout.chat_list_content;
+                    break;
+                default:
+                    layout = R.layout.chat_list_content;
+                    break;
+            }
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(layout, parent, false);
+            return new ChatListVH(view);
+        }
+
+        @Override
+        public void onBindHeaderViewHolder(ChatListVH holder, int section) {
+            switch (section) {
+                case 0:
+                    holder._title.setText("channels");
+                    holder._addPrivateChannel.setVisibility(View.GONE);
+                    break;
+                case 1:
+                    holder._title.setText("direct messaging");
+                    holder._addPrivateChannel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //..
+                        }
+                    });
+                    break;
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(final ChatListVH holder,
+                                     int position,
+                                     int relativePosition,
+                                     int absolutePosition) {
+            switch (position) {
+                case 0:
+                    holder._chat = _chats.get(relativePosition);
+                    holder._idView.setText("#");
+                    holder._contentView.setText(_chats.get(relativePosition).getName());
+                    holder._view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (_twoPane) {
+                                // Not implemented
+                                // Bundle arguments = new Bundle();
+                                // arguments.putSerializable(ChatDetailFragment.CHAT_ITEM, holder._chat);
+                                // ChatDetailFragment fragment = new ChatDetailFragment();
+                                // fragment.setArguments(arguments);
+                                // getSupportFragmentManager().beginTransaction()
+                                //     .replace(R.id.chat_detail_container, fragment)
+                                //     .commit();
+                            } else {
+                                Context context = v.getContext();
+                                Intent intent = new Intent(context, ChatDetailActivity.class);
+                                intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
+                                intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                    break;
+                case 1:
+                    holder._chat = null;
+                    holder._idView.setText("@");
+                    holder._contentView.setText(_directChannels.get(relativePosition).getUserName());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public int getSectionCount() {
+            return 2; // number of sections.
+        }
+
+        @Override
+        public int getItemCount(int section) {
+            switch (section) {
+                case 0:
+                    return _chats.size();
+                case 1:
+                    return _directChannels.size();
+                default:
+                    return 0;
+            }
+        }
+
+        public class ChatListVH extends RecyclerView.ViewHolder {
             public final View _view;
+
             public final TextView _idView;
             public final TextView _contentView;
+            public final TextView _title;
+            public final Button _addPrivateChannel;
+
             public Chat _chat;
 
-            public ViewHolder(View view) {
+            public ChatListVH(View view) {
                 super(view);
                 _view = view;
-                _idView = (TextView) view.findViewById(R.id.id);
-                _contentView = (TextView) view.findViewById(R.id.content);
+                _idView = (TextView) view.findViewById(R.id.chat_item_label);
+                _contentView = (TextView) view.findViewById(R.id.chat_item_content);
+                _title = (TextView) view.findViewById(R.id.chat_header_title);
+                _addPrivateChannel = (Button) view.findViewById(R.id.add_private_channel);
             }
 
             @Override
             public String toString() {
-                return super.toString() + " '" + _contentView.getText() + "'";
+                return super.toString() + "'" + _contentView.getText() + "'";
             }
         }
     }
+
+
 }

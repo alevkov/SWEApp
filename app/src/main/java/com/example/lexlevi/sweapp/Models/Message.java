@@ -16,10 +16,10 @@ public class Message implements IMessage {
     private String body;
     @SerializedName("author")
     @Expose
-    private User author; // id or {id, firstName, lastName, userName}
+    private User author;
     @SerializedName("chat")
     @Expose
-    private String chat; // id
+    private String chat;
     @SerializedName("updatedAt")
     @Expose
     private Date updatedAt;
@@ -60,7 +60,14 @@ public class Message implements IMessage {
     }
 
     public String getBody() {
-        return body;
+        return "@" + getAuthor().getName() +
+                System.getProperty("line.separator") +
+                System.getProperty("line.separator") +
+                body;
+    }
+
+    public String getRawBody() {
+        return this.body;
     }
 
     public void setBody(String body) {
