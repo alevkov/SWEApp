@@ -1,7 +1,7 @@
 package com.example.lexlevi.sweapp.Singletons;
 
 import com.example.lexlevi.sweapp.Common.URLs;
-import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

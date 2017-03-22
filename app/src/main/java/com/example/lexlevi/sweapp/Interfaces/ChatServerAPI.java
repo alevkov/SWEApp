@@ -1,4 +1,4 @@
-package com.example.lexlevi.sweapp.Controllers;
+package com.example.lexlevi.sweapp.Interfaces;
 
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Course;
@@ -10,7 +10,6 @@ import com.example.lexlevi.sweapp.Common.URLs;
 import retrofit2.http.*;
 import retrofit2.Call;
 
-import java.net.URL;
 import java.util.List;
 
 public interface ChatServerAPI {
@@ -53,11 +52,8 @@ public interface ChatServerAPI {
     Call<List<Message>> getMessagesForChat(@Path("id") String id);
     @GET(URLs.kGetUsersForChat)
     Call<List<User>> getUsersForChat(@Path("id") String id);
-    @Multipart
     @POST(URLs.kCreateNewChatForGroup)
-    Call<Chat> createChatForGroup(@Part("user") User user,
-                                  @Part("message") Message message,
-                                  @Body Chat chat,
+    Call<Chat> createChatForGroup(@Body Chat chat,
                                   @Path("groupId") String groupId);
     @PATCH(URLs.kUpdateChatForId)
     Call<Chat> updateChatForId(@Path("id") String id);

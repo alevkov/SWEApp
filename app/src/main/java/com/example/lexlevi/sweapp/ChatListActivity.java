@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -23,9 +25,12 @@ import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
 import com.example.lexlevi.sweapp.Singletons.SocketConnector;
+import com.example.lexlevi.sweapp.Singletons.UserSession;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -42,11 +47,14 @@ import retrofit2.Response;
  */
 public class ChatListActivity extends AppCompatActivity {
 
-    private boolean _twoPane; // won't really be used2
+    private boolean _twoPane; // won't really be used
     private Socket _socket;
 
     public Group _group;
     public List<User> _groupUsers;
+    public ArrayList<String> _directChatUsers;
+
+    public RecyclerView _chatListView;
 
 
     @Override
@@ -76,8 +84,9 @@ public class ChatListActivity extends AppCompatActivity {
         });
 
         View recyclerView = findViewById(R.id.chat_list);
+        _chatListView = (RecyclerView) recyclerView;
         recyclerView.setBottom(3);
-
+        _directChatUsers = new ArrayList<>();
         setupRecyclerView((RecyclerView) recyclerView);
 
         if (findViewById(R.id.chat_detail_container) != null) {
@@ -104,6 +113,7 @@ public class ChatListActivity extends AppCompatActivity {
                             public void onResponse(Call<List<User>> call, Response<List<User>> userResponse) {
                                 switch (userResponse.code()) {
                                     case 200:
+                                        _groupUsers = userResponse.body();
                                         recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse.body(),
                                                 userResponse.body()));
                                         break;
@@ -154,14 +164,33 @@ public class ChatListActivity extends AppCompatActivity {
 
     // Adapter
     public class ChatRecyclerViewAdapter
-            extends SectionedRecyclerViewAdapter<ChatRecyclerViewAdapter.ChatListVH> {
+            extends SectionedRecyclerViewAdapter<ChatRecyclerViewAdapter.ChatListVH>
+            implements PopupMenu.OnMenuItemClickListener {
 
         private final List<Chat> _chats;
-        private final List<User> _directChannels;
+        private final List<Chat> _groupChats;
+        private final List<Chat> _directChats;
+        private final List<User> _users;
 
         public ChatRecyclerViewAdapter(List<Chat> chats, List<User> users) {
             _chats = chats;
-            _directChannels = users;
+            _groupChats = new ArrayList<>();
+            _directChats = new ArrayList<>();
+            _users = users;
+            for (Chat c : _chats) {
+                if (c.getIsGroupMessage()) {
+                    _groupChats.add(c);
+                } else {
+                    if (c.getParticipants().size() == 1
+                            && !c.getParticipants().get(0).equals(UserSession
+                            .getInstance()
+                            .getCurrentUser()
+                            .getId())) {
+                        continue;
+                    }
+                    _directChats.add(c);
+                }
+            }
         }
 
         @Override
@@ -195,11 +224,53 @@ public class ChatListActivity extends AppCompatActivity {
                     holder._addPrivateChannel.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            //..
+                            final PopupMenu popupMenu = new PopupMenu(ChatListActivity.this, v);
+                            popupMenu.setOnMenuItemClickListener(ChatRecyclerViewAdapter.this);
+                            popupMenu.inflate(R.menu.menu_group_users);
+                            int userId = 0;
+                            for (User u : _groupUsers) {
+                                popupMenu.getMenu().add(0, userId, userId++, u.getName());
+                            }
+                            popupMenu.show();
                         }
                     });
                     break;
             }
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            String myId = UserSession
+                    .getInstance()
+                    .getCurrentUser()
+                    .getId();
+            if (_groupUsers.get(item.getOrder()).getId().equals(myId) ||
+                    _directChatUsers.contains(_groupUsers.get(item.getOrder()).getId())) {
+                return false;
+            }
+            Chat directChat = new Chat();
+            List<String> p = Arrays.asList(myId, _groupUsers.get(item.getOrder()).getId());
+            directChat.setParticipants(p);
+            directChat.setIsGroupMessage(false);
+            directChat.setGroup(_group.getId());
+            Call<Chat> createDirectChat = ChatServerClient
+                    .getInstance()
+                    .api()
+                    .createChatForGroup(
+                            directChat,
+                            _group.getId());
+            createDirectChat.enqueue(new Callback<Chat>() {
+                @Override
+                public void onResponse(Call<Chat> call, Response<Chat> response) {
+                    setupRecyclerView(_chatListView);
+                }
+
+                @Override
+                public void onFailure(Call<Chat> call, Throwable t) {
+
+                }
+            });
+            return false;
         }
 
         @Override
@@ -209,14 +280,14 @@ public class ChatListActivity extends AppCompatActivity {
                                      int absolutePosition) {
             switch (position) {
                 case 0:
-                    holder._chat = _chats.get(relativePosition);
+                    holder._chat = _groupChats.get(relativePosition);
                     holder._idView.setText("#");
-                    holder._contentView.setText(_chats.get(relativePosition).getName());
+                    holder._contentView.setText(_groupChats.get(relativePosition).getName());
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if (_twoPane) {
-                                // Not implemented
+                                // Not implemented yet
                                 // Bundle arguments = new Bundle();
                                 // arguments.putSerializable(ChatDetailFragment.CHAT_ITEM, holder._chat);
                                 // ChatDetailFragment fragment = new ChatDetailFragment();
@@ -235,9 +306,53 @@ public class ChatListActivity extends AppCompatActivity {
                     });
                     break;
                 case 1:
-                    holder._chat = null;
                     holder._idView.setText("@");
-                    holder._contentView.setText(_directChannels.get(relativePosition).getUserName());
+                    String myId = UserSession.getInstance().getCurrentUser().getId();
+                    List<String> chatUsers = _directChats.get(relativePosition).getParticipants();
+                    if (chatUsers.size() == 1 && chatUsers.get(0).equals(myId) ||
+                            chatUsers.size() > 1 && chatUsers.contains(myId)) {
+                        holder._chat = _directChats.get(relativePosition);
+                        if (chatUsers.size() == 1) {
+                            holder._chat.setName("@me");
+                            holder._contentView.setText(UserSession
+                                    .getInstance()
+                                    .getCurrentUser()
+                                    .getUserName());
+                        } else {
+                            String theirId = chatUsers.get(0).equals(myId) ? chatUsers.get(1) : chatUsers.get(0);
+                            for (User u : _users) {
+                                if (theirId.equals(u.getId())) {
+                                    _directChatUsers.add(u.getId());
+                                    holder._chat.setName("@" + u.getName());
+                                    holder._contentView.setText(u.getName());
+                                }
+                            }
+                        }
+                    }
+                    holder._view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (_twoPane) {
+                                // Not implemented yet
+                                // Bundle arguments = new Bundle();
+                                // arguments.putSerializable(ChatDetailFragment.CHAT_ITEM, holder._chat);
+                                // ChatDetailFragment fragment = new ChatDetailFragment();
+                                // fragment.setArguments(arguments);
+                                // getSupportFragmentManager().beginTransaction()
+                                //     .replace(R.id.chat_detail_container, fragment)
+                                //     .commit();
+                            } else {
+                                Context context = v.getContext();
+                                Intent intent = new Intent(context, ChatDetailActivity.class);
+                                intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
+                                intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+                    // Self-chat
+                    // has only 1 participant, the current user
+
                     break;
                 default:
                     break;
@@ -253,9 +368,9 @@ public class ChatListActivity extends AppCompatActivity {
         public int getItemCount(int section) {
             switch (section) {
                 case 0:
-                    return _chats.size();
+                    return _groupChats.size();
                 case 1:
-                    return _directChannels.size();
+                    return _directChats.size();
                 default:
                     return 0;
             }
