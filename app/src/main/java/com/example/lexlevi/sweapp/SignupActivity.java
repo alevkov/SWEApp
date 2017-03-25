@@ -2,7 +2,7 @@ package com.example.lexlevi.sweapp;
 
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Common.Constants;
-import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -10,24 +10,17 @@ import com.wang.avi.AVLoadingIndicatorView;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ListView;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
-import android.widget.CheckedTextView;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;

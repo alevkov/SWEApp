@@ -2,7 +2,6 @@ package com.example.lexlevi.sweapp.Adapters;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
 import android.content.Context;
@@ -13,20 +12,8 @@ import android.widget.TextView;
 
 import com.example.lexlevi.sweapp.ChatDetailFragment;
 import com.example.lexlevi.sweapp.ChatListActivity;
-import com.example.lexlevi.sweapp.Common.URLs;
-import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Group;
-import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.R;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GroupAdapter extends BaseAdapter {
     private final Context mContext;

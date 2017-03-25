@@ -10,7 +10,7 @@ import android.view.View;
 
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Common.Constants;
-import com.example.lexlevi.sweapp.Controllers.ChatServerAPI;
+import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Singletons.UserSession;
