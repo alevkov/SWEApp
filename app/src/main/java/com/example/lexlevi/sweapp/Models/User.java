@@ -1,11 +1,15 @@
 package com.example.lexlevi.sweapp.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.stfalcon.chatkit.commons.models.IUser;
 
-public class User implements IUser {
+public class User implements IUser, Serializable {
 
     @SerializedName("semester")
     @Expose
