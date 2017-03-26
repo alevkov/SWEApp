@@ -12,6 +12,7 @@ import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.R;
 import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
 import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +25,12 @@ import retrofit2.Response;
 public class DashboardGroups extends Fragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
+
     private View _rootView;
     private GridView _groupsView;
+    private AVLoadingIndicatorView _groupsAvi;
 
-    public DashboardGroups() {
-
-    }
+    public DashboardGroups() { }
 
     public static DashboardGroups newInstance(int sectionNumber) {
         DashboardGroups fragment = new DashboardGroups();
@@ -44,6 +45,8 @@ public class DashboardGroups extends Fragment {
                              Bundle savedInstanceState) {
         _rootView = inflater.inflate(R.layout.fragment_dashboard_groups, container, false);
         _groupsView = (GridView) _rootView.findViewById(R.id.group_gridview);
+        _groupsAvi = (AVLoadingIndicatorView) _rootView.findViewById(R.id.groups_avi);
+        _groupsAvi.show();
         loadGroups(_groupsView);
         return _rootView;
     }
@@ -74,11 +77,12 @@ public class DashboardGroups extends Fragment {
                 GroupAdapter booksAdapter = new GroupAdapter(getContext(),
                         groups.toArray(new Group[groups.size()]));
                 view.setAdapter(booksAdapter);
+                _groupsAvi.hide();
             }
 
             @Override
             public void onFailure(Call<List<Group>> call, Throwable t) {
-                //..
+                _groupsAvi.hide();
             }
         });
     }
