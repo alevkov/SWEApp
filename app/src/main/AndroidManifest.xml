@@ -32,13 +32,17 @@
             android:label="@string/title_activity_create_group"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".CreateChatActivity"
+            android:label="@string/title_activity_create_chat"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".DashboardActivity"
             android:label="@string/title_activity_dashboard"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChatListActivity"
             android:label="@string/title_chat_list"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ChatDetailActivity"
             android:label="@string/title_chat_detail"

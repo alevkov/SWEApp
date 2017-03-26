@@ -95,7 +95,6 @@ public class CreateGroupActivity extends AppCompatActivity {
         });
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         if (show)
             _avi.show();
@@ -141,7 +140,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Group> call, Response<Group> response) {
                 showProgress(false);
-                Snackbar.make(_fab, "Group Made", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(_fab, "Group Created", Snackbar.LENGTH_LONG).show();
             }
 
             @Override

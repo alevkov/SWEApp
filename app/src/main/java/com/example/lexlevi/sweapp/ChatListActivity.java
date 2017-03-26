@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -75,14 +76,6 @@ public class ChatListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //.. for creating new chat
-            }
-        });
-
         View recyclerView = findViewById(R.id.chat_list);
         _chatListView = (RecyclerView) recyclerView;
         recyclerView.setBottom(3);
@@ -92,6 +85,12 @@ public class ChatListActivity extends AppCompatActivity {
         if (findViewById(R.id.chat_detail_container) != null) {
             _twoPane = true;
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setupRecyclerView(_chatListView);
     }
 
     private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
@@ -116,12 +115,29 @@ public class ChatListActivity extends AppCompatActivity {
                                         _groupUsers = userResponse.body();
                                         recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse.body(),
                                                 userResponse.body()));
+                                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+                                        fab.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                Intent intent = new Intent(ChatListActivity.this, CreateChatActivity.class);
+                                                ArrayList<User> users = (ArrayList<User>) _groupUsers;
+                                                intent.putExtra("groupUsers", users);
+                                                intent.putExtra("groupId", _group.getId());
+                                                startActivity(intent);
+                                            }
+                                        });
                                         break;
                                 }
                             }
                             @Override
                             public void onFailure(Call<List<User>> call, Throwable t) { // fail to load users
-                                Log.d("ERROR: ", t.toString());
+                                Snackbar s;
+                                s = Snackbar.make(recyclerView,
+                                        "Oops! Something went wrong",
+                                        Snackbar.LENGTH_LONG);
+                                s.getView().setBackgroundColor(getResources()
+                                        .getColor(R.color.excitedColor));
+                                s.show();
                             }
                         });
                         break;
@@ -132,7 +148,13 @@ public class ChatListActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Chat>> call, Throwable t) { // fail to load chats
-
+                Snackbar s;
+                s = Snackbar.make(recyclerView,
+                        "Oops! Something went wrong",
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources()
+                        .getColor(R.color.excitedColor));
+                s.show();
             }
         });
     }
