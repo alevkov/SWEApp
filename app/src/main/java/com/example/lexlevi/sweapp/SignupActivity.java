@@ -5,6 +5,7 @@ import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.Client;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import android.app.ProgressDialog;
@@ -62,17 +63,12 @@ public class SignupActivity extends AppCompatActivity {
         setTitle(" ");
         ButterKnife.inject(this);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLs.BASE_API)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
         // Get all courses
         _avi.show();
         _selectCourses.setEnabled(false);
-        selectedCourses = new HashMap<Integer, Course>();
-        courseList = new ArrayList<Course>();
-        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
-        Call<List<Course>> call = chatServerAPI.getAllCourses();
+        selectedCourses = new HashMap<>();
+        courseList = new ArrayList<>();
+        Call<List<Course>> call = Client.shared().api().getAllCourses();
         call.enqueue(new Callback<List<Course>>() {
             Snackbar s;
             @Override
@@ -273,7 +269,6 @@ public class SignupActivity extends AppCompatActivity {
 
     public void onSignupFailed() {
         Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
-
         _signupButton.setEnabled(true);
     }
 

@@ -10,18 +10,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by lexlevi on 3/19/17.
  */
 
-public class ChatServerClient {
+public class Client {
 
-    private static ChatServerClient instance = null;
+    private static Client instance = null;
     public static ChatServerAPI api = null;
 
-    protected ChatServerClient() {
+    protected Client() {
         // Exists only to defeat instantiation.
     }
 
-    public static ChatServerClient getInstance() {
+    public static Client shared() {
         if (instance == null) {
-            instance = new ChatServerClient();
+            instance = new Client();
             api = new Retrofit.Builder()
                     .baseUrl(URLs.BASE_API)
                     .addConverterFactory(GsonConverterFactory.create())

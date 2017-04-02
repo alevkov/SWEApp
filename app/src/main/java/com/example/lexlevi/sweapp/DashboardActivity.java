@@ -17,7 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Session;
 
 import layout.DashboardClassmates;
 import layout.DashboardGroups;
@@ -37,7 +37,7 @@ public class DashboardActivity extends AppCompatActivity
         if(Build.VERSION.SDK_INT >= 21)
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         setSupportActionBar(toolbar);
-        setTitle("Welcome, " + UserSession.getInstance().getCurrentUser().getName());
+        setTitle("Welcome, " + Session.shared().user().getName());
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());

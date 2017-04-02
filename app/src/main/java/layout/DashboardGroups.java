@@ -10,8 +10,8 @@ import android.widget.GridView;
 import com.example.lexlevi.sweapp.Adapters.GroupAdapter;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.R;
-import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Client;
+import com.example.lexlevi.sweapp.Singletons.Session;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
@@ -59,12 +59,12 @@ public class DashboardGroups extends Fragment {
 
     protected void loadGroups(final GridView view) {
         final ArrayList<Group> groups = new ArrayList<>();
-        Call<List<Group>> call = ChatServerClient
-                .getInstance()
+        Call<List<Group>> call = Client
+                .shared()
                 .api()
-                .getGroupListForUser(UserSession
-                    .getInstance()
-                    .getCurrentUser()
+                .getGroupListForUser(Session
+                    .shared()
+                    .user()
                     .getId());
         call.enqueue(new Callback<List<Group>>() {
             @Override

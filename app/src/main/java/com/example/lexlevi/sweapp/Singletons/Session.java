@@ -2,17 +2,17 @@ package com.example.lexlevi.sweapp.Singletons;
 
 import com.example.lexlevi.sweapp.Models.User;
 
-public class UserSession {
-    private static UserSession instance = null;
+public class Session {
+    private static Session instance = null;
     private User currentUser;
 
-    protected UserSession() {
+    protected Session() {
         // Exists only to defeat instantiation.
     }
 
-    public static UserSession getInstance() {
+    public static Session shared() {
         if(instance == null) {
-            instance = new UserSession();
+            instance = new Session();
         }
         return instance;
     }
@@ -22,7 +22,7 @@ public class UserSession {
         return currentUser;
     }
 
-    public User getCurrentUser() {
+    public User user() {
         return currentUser;
     }
 

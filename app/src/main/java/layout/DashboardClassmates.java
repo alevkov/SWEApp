@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import com.example.lexlevi.sweapp.Adapters.ClassmatesAdapter;
 import com.example.lexlevi.sweapp.Models.Classmate;
 import com.example.lexlevi.sweapp.R;
-import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Client;
+import com.example.lexlevi.sweapp.Singletons.Session;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
@@ -80,12 +80,12 @@ public class DashboardClassmates extends Fragment {
     private void loadClassmates(final RecyclerView recyclerView) {
         _classmates = new ArrayList<>();
 
-        Call<List<Classmate>> getMatches = ChatServerClient
-                .getInstance()
+        Call<List<Classmate>> getMatches = Client
+                .shared()
                 .api()
-                .getMatchingUsersForId(UserSession
-                        .getInstance()
-                        .getCurrentUser()
+                .getMatchingUsersForId(Session
+                        .shared()
+                        .user()
                         .getId());
         getMatches.enqueue(new Callback<List<Classmate>>() {
             @Override

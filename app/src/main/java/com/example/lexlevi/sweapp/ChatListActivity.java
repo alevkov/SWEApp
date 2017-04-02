@@ -24,9 +24,9 @@ import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.User;
-import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
-import com.example.lexlevi.sweapp.Singletons.SocketConnector;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Client;
+import com.example.lexlevi.sweapp.Singletons.Sockets;
+import com.example.lexlevi.sweapp.Singletons.Session;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -62,7 +62,7 @@ public class ChatListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // set up socket events
-        _socket = SocketConnector.getInstance().getSocket();
+        _socket = Sockets.shared().getSocket();
         _socket.on(Constants.sEvenUserJoin, onUserJoin);
         _socket.on(Constants.sEventUpdateUsers, onUpdateUsers);
         // get selected group
@@ -94,8 +94,8 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
-        Call<List<Chat>> callChats = ChatServerClient
-                .getInstance()
+        Call<List<Chat>> callChats = Client
+                .shared()
                 .api()
                 .getChatListForGroup(_group.getId());
         callChats.enqueue(new Callback<List<Chat>>() { // call to load group chats
@@ -103,10 +103,7 @@ public class ChatListActivity extends AppCompatActivity {
             public void onResponse(Call<List<Chat>> call, final Response<List<Chat>> chatResponse) {
                 switch (chatResponse.code()) {
                     case 200:
-                        Call<List<User>> callUsers = ChatServerClient
-                                .getInstance()
-                                .api()
-                                .getGroupUsersList(_group.getId());
+                        Call<List<User>> callUsers = Client.shared().api().getGroupUsersList(_group.getId());
                         callUsers.enqueue(new Callback<List<User>>() { // call to load users chained after loading chats
                             @Override
                             public void onResponse(Call<List<User>> call, Response<List<User>> userResponse) {
@@ -119,7 +116,8 @@ public class ChatListActivity extends AppCompatActivity {
                                         fab.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view) {
-                                                Intent intent = new Intent(ChatListActivity.this, CreateChatActivity.class);
+                                                Intent intent = new Intent(ChatListActivity.this,
+                                                        CreateChatActivity.class);
                                                 ArrayList<User> users = (ArrayList<User>) _groupUsers;
                                                 intent.putExtra("groupUsers", users);
                                                 intent.putExtra("groupId", _group.getId());
@@ -203,10 +201,16 @@ public class ChatListActivity extends AppCompatActivity {
                 if (c.getIsGroupMessage()) {
                     _groupChats.add(c);
                 } else {
-                    if (c.getParticipants().size() == 1
-                            && !c.getParticipants().get(0).equals(UserSession
-                            .getInstance()
-                            .getCurrentUser()
+                    if (c.getParticipants().size() == 1 &&
+                            !c.getParticipants().get(0).equals(Session
+                            .shared()
+                            .user()
+                            .getId())) {
+                        continue;
+                    } else if (c.getParticipants().size() > 1 &&
+                            !c.getParticipants().contains(Session
+                            .shared()
+                            .user()
                             .getId())) {
                         continue;
                     }
@@ -261,11 +265,8 @@ public class ChatListActivity extends AppCompatActivity {
         }
 
         @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            String myId = UserSession
-                    .getInstance()
-                    .getCurrentUser()
-                    .getId();
+        public boolean onMenuItemClick(final MenuItem item) {
+            String myId = Session.shared().user().getId();
             if (_groupUsers.get(item.getOrder()).getId().equals(myId) ||
                     _directChatUsers.contains(_groupUsers.get(item.getOrder()).getId())) {
                 return false;
@@ -275,16 +276,20 @@ public class ChatListActivity extends AppCompatActivity {
             directChat.setParticipants(p);
             directChat.setIsGroupMessage(false);
             directChat.setGroup(_group.getId());
-            Call<Chat> createDirectChat = ChatServerClient
-                    .getInstance()
-                    .api()
+            Call<Chat> createDirectChat = Client.shared().api()
                     .createChatForGroup(
                             directChat,
                             _group.getId());
             createDirectChat.enqueue(new Callback<Chat>() {
                 @Override
                 public void onResponse(Call<Chat> call, Response<Chat> response) {
-                    setupRecyclerView(_chatListView);
+                    // open the newly created directed chat
+                    Context context = getApplicationContext();
+                    Intent intent = new Intent(context, ChatDetailActivity.class);
+                    response.body().setName("@" + _groupUsers.get(item.getOrder()).getName());
+                    intent.putExtra(ChatDetailFragment.CHAT_ITEM, response.body());
+                    intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
+                    startActivity(intent);
                 }
 
                 @Override
@@ -329,17 +334,14 @@ public class ChatListActivity extends AppCompatActivity {
                     break;
                 case 1:
                     holder._idView.setText("@");
-                    String myId = UserSession.getInstance().getCurrentUser().getId();
+                    String myId = Session.shared().user().getId();
                     List<String> chatUsers = _directChats.get(relativePosition).getParticipants();
                     if (chatUsers.size() == 1 && chatUsers.get(0).equals(myId) ||
                             chatUsers.size() > 1 && chatUsers.contains(myId)) {
                         holder._chat = _directChats.get(relativePosition);
                         if (chatUsers.size() == 1) {
                             holder._chat.setName("@me");
-                            holder._contentView.setText(UserSession
-                                    .getInstance()
-                                    .getCurrentUser()
-                                    .getUserName());
+                            holder._contentView.setText(Session.shared().user().getUserName());
                         } else {
                             String theirId = chatUsers.get(0).equals(myId) ? chatUsers.get(1) : chatUsers.get(0);
                             for (User u : _users) {

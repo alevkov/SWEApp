@@ -16,8 +16,8 @@ import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.Message;
-import com.example.lexlevi.sweapp.Singletons.SocketConnector;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Sockets;
+import com.example.lexlevi.sweapp.Singletons.Session;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
@@ -60,7 +60,7 @@ public class ChatDetailFragment extends Fragment {
             _chat = (Chat) getActivity().getIntent().getSerializableExtra(CHAT_ITEM);
             _group = (Group) getActivity().getIntent().getSerializableExtra(GROUP_ITEM);
 
-            _socket = SocketConnector.getInstance().getSocket();
+            _socket = Sockets.shared().getSocket();
             _socket.on(Constants.sEventNewMessage, onNewMessage);
             if (_socket.connected())
                 _socket.emit(Constants.sEventJoinChat, _chat.getId());
@@ -92,9 +92,9 @@ public class ChatDetailFragment extends Fragment {
         noMessages.setVisibility(View.GONE);
         RelativeLayout messagesListContainer = (RelativeLayout) _rView.findViewById(R.id.message_list_container);
         final MessagesList messagesList = (MessagesList) messagesListContainer.findViewById(R.id.messagesList);
-        final MessagesListAdapter<Message> adapter = new MessagesListAdapter<>(UserSession
-                .getInstance()
-                .getCurrentUser()
+        final MessagesListAdapter<Message> adapter = new MessagesListAdapter<>(Session
+                .shared()
+                .user()
                 .getId(), null);
         _chatAdapter = adapter;
         messagesList.setAdapter(adapter);
@@ -137,9 +137,9 @@ public class ChatDetailFragment extends Fragment {
             public boolean onSubmit(CharSequence input) {
                 Message m = new Message();
                 Gson g = new Gson();
-                m.setAuthor(UserSession
-                .getInstance()
-                .getCurrentUser());
+                m.setAuthor(Session
+                .shared()
+                .user());
                 m.setBody(input.toString());
                 m.setChat(_chat.getId());
                 m.setCreatedAt(new Date());

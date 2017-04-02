@@ -22,6 +22,10 @@ public interface ChatServerAPI {
     Call<User> getUserForId(@Path("id") String id);
     @GET(URLs.kUserMatch)
     Call<List<Classmate>> getMatchingUsersForId(@Path("id") String id);
+    @POST(URLs.kInviteUserToGroup)
+    Call<User> inviteUserToGroup(@Path("userId") String userId,
+                                 @Path("sender") String sender,
+                                 @Body List<String> groupIds);
     @POST(URLs.kUserSignup)
     Call<User> createUser(@Body User user);
     @POST(URLs.kUserLogin)
