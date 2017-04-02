@@ -46,6 +46,7 @@ public class CreateGroupActivity extends AppCompatActivity {
     List<Course> _selectedCourse;
     List<String> _days;
     boolean[] _selectedDays = new boolean[Constants.days.length];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

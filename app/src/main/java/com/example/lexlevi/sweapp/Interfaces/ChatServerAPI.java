@@ -1,6 +1,7 @@
 package com.example.lexlevi.sweapp.Interfaces;
 
 import com.example.lexlevi.sweapp.Models.Chat;
+import com.example.lexlevi.sweapp.Models.Classmate;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.Message;
@@ -19,6 +20,8 @@ public interface ChatServerAPI {
     Call<List<User>> getUsers();
     @GET(URLs.kGetUserForId)
     Call<User> getUserForId(@Path("id") String id);
+    @GET(URLs.kUserMatch)
+    Call<List<Classmate>> getMatchingUsersForId(@Path("id") String id);
     @POST(URLs.kUserSignup)
     Call<User> createUser(@Body User user);
     @POST(URLs.kUserLogin)

@@ -19,12 +19,12 @@ import android.view.View;
 
 import com.example.lexlevi.sweapp.Singletons.UserSession;
 
-import layout.DashboardFriends;
+import layout.DashboardClassmates;
 import layout.DashboardGroups;
 import layout.DashboardProfile;
 
 public class DashboardActivity extends AppCompatActivity
-        implements DashboardProfile.OnFragmentInteractionListener, DashboardFriends.OnFragmentInteractionListener {
+        implements DashboardProfile.OnFragmentInteractionListener, DashboardClassmates.OnFragmentInteractionListener {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -114,7 +114,7 @@ public class DashboardActivity extends AppCompatActivity
                 case 1:
                     return DashboardProfile.newInstance("arg1", "arg2");
                 case 2:
-                    return DashboardFriends.newInstance("arg1", "arg2");
+                    return DashboardClassmates.newInstance("arg1", "arg2");
             }
             return null;
         }
@@ -132,7 +132,7 @@ public class DashboardActivity extends AppCompatActivity
                 case 1:
                     return "Profile";
                 case 2:
-                    return "Friends";
+                    return "Classmates";
             }
             return null;
         }
@@ -140,11 +140,6 @@ public class DashboardActivity extends AppCompatActivity
 
     @Override
     public void onProfileFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onFriendsFragmentInteraction(Uri uri) {
 
     }
 }

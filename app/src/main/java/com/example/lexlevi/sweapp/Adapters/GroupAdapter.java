@@ -16,52 +16,47 @@ import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.R;
 
 public class GroupAdapter extends BaseAdapter {
-    private final Context mContext;
-    private final Group[] groups;
+    private final Context _context;
+    private final Group[] _groups;
 
-    // 1
     public GroupAdapter(Context context, Group[] groups) {
-        this.mContext = context;
-        this.groups = groups;
+        _context = context;
+        _groups = groups;
     }
 
-    // 2
     @Override
     public int getCount() {
-        return groups.length;
+        return _groups.length;
     }
 
-    // 3
     @Override
     public long getItemId(int position) {
         return 0;
     }
 
-    // 4
     @Override
     public Object getItem(int position) {
         return null;
     }
 
-    // 5
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+            final LayoutInflater layoutInflater = LayoutInflater.from(_context);
             convertView = layoutInflater.inflate(R.layout.linearlayout_group, null);
         }
 
         final TextView nameTextView = (TextView)convertView.findViewById(R.id.textview_group_name);
         final ImageView imageViewFavorite = (ImageView)convertView.findViewById(R.id.imageview_favorite);
-        nameTextView.setText(groups[position].toString());
+        nameTextView.setText(_groups[position].toString());
         nameTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, ChatListActivity.class);
+                Intent intent = new Intent(_context, ChatListActivity.class);
                 Bundle extras = new Bundle();
-                extras.putSerializable(ChatDetailFragment.GROUP_ITEM, groups[position]);
+                extras.putSerializable(ChatDetailFragment.GROUP_ITEM, _groups[position]);
                 intent.putExtras(extras);
-                mContext.startActivity(intent);
+                _context.startActivity(intent);
             }
         });
         return convertView;

@@ -6,7 +6,7 @@
     <color name="hintColor">#FEFEFE</color>
     <color name="hilightColor">#7FBEE3</color>
     <color name="textColor">#FEFEFE</color>
-    <color name="bgColor">#33446B</color>
+    <color name="bgColor">#33446b</color>
     <color name="navigationBarColor">#0BA08C</color>
     <color name="excitedColor">#FC3A51</color>
 </resources>

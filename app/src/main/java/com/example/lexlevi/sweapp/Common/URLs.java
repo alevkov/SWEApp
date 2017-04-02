@@ -12,6 +12,7 @@ public class URLs {
     public static final String kGetUserForId = "users/{id}";
     public static final String kUserLogin = "users/login";
     public static final String kUserSignup = "users/new";
+    public static final String kUserMatch = "/users/{id}/match";
 
     // Course Endpoints
     public static final String kGetCourses = "courses";
