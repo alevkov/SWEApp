@@ -1,13 +1,102 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="layout.DashboardProfile">
+    tools:context="layout.DashboardProfile"
+    android:background="@color/bgColor"
+    android:id="@+id/frameLayout4">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="463dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="345dp"
+                android:layout_height="281dp"
+                app:srcCompat="@drawable/prof"
+                android:id="@+id/imageView7"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="242dp"
+                android:layout_height="53dp"
+                android:textColor="@color/textColor"
+                android:textSize="42dp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:id="@+id/username_profile"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="162dp"
+                android:layout_height="40dp"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:gravity="center|left"
+                android:textColor="@color/textColor"
+                android:id="@+id/name_profile"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="176dp"
+                android:layout_height="23dp"
+                android:id="@+id/profile_year"
+                android:textSize="18dp"
+                android:textStyle="italic"
+                android:gravity="left|center"
+                android:textColor="@color/textColor"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="162dp"
+                android:layout_height="39dp"
+                android:id="@+id/profile_email"
+                android:textColor="@color/textColor"
+                android:gravity="center|left"
+                android:textSize="18dp"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="293dp"
+                android:layout_height="42dp"
+                android:id="@+id/profile_major"
+                android:textSize="18dp"
+                android:textColor="@color/textColor"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp" />
+
+            <TextView
+                android:text="TextView"
+                android:layout_width="265dp"
+                android:layout_height="109dp"
+                android:textColor="@color/textColor"
+                android:textSize="18dp"
+                android:gravity="left"
+                android:id="@+id/profile_courses"
+                tools:layout_editor_absoluteY="0dp"
+                tools:layout_editor_absoluteX="0dp"
+                android:layout_marginBottom="30dp"/>
+
+        </LinearLayout>
+    </ScrollView>
 
 </FrameLayout>
