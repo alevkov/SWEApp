@@ -47,9 +47,6 @@ public class DashboardProfile extends Fragment {
     private String _major;
     private String _year;
     private String _email;
-    //private String _courses;
-
-
 
     private View _rootView;
     private TextView _usernameTextView;
@@ -98,8 +95,6 @@ public class DashboardProfile extends Fragment {
         _year = UserSession.getInstance().getCurrentUser().getYear();
         _email = UserSession.getInstance().getCurrentUser().getEmail();
         _major = UserSession.getInstance().getCurrentUser().getMajor();
-        //_courses = UserSession.getInstance().getCurrentUser().getCourses();
-
 
         _usernameTextView = (TextView) _rootView.findViewById(R.id.username_profile);
         _nameTextView = (TextView) _rootView.findViewById(R.id.name_profile) ;
@@ -115,17 +110,13 @@ public class DashboardProfile extends Fragment {
         _emailTextView.setText("E-mail: " +_email);
         _majorTextView.setText("Major: " + _major);
 
-        //courses += "Courses: \r\n";
-
         for (Course c : UserSession.getInstance().getCurrentUser().getCourses()) {
             courses += c.getName();
             courses += "\r\n";
         }
 
         _coursesTextView.setText(courses);
-
-
-        // Inflate the layout for this fragment
+        
         return _rootView;
     }
 
