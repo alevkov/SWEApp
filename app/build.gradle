@@ -37,4 +37,5 @@ dependencies {
     compile 'com.jaredrummler:material-spinner:1.1.0'
     compile 'com.afollestad:sectioned-recyclerview:0.2.3'
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
