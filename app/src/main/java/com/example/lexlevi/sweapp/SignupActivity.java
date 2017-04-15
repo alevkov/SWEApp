@@ -5,6 +5,7 @@ import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.Client;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import android.app.ProgressDialog;
@@ -49,11 +50,11 @@ public class SignupActivity extends AppCompatActivity {
     @InjectView(R.id.avi) AVLoadingIndicatorView _avi;
     @InjectView(R.id.sign_up_form) ScrollView _signUpForm;
 
-    private ArrayList<Course> courseList = null;
-    private HashMap<Integer, Course> selectedCourses = null;
-    private String selectedMajor = "";
-    private String selectedYear = "";
-    private String selectedSemester = "";
+    private ArrayList<Course> _courseList = null;
+    private HashMap<Integer, Course> _selectedCourses = null;
+    private String _selectedMajor = "";
+    private String _selectedYear = "";
+    private String _selectedSemester = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,23 +63,18 @@ public class SignupActivity extends AppCompatActivity {
         setTitle(" ");
         ButterKnife.inject(this);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URLs.BASE_API)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
         // Get all courses
         _avi.show();
         _selectCourses.setEnabled(false);
-        selectedCourses = new HashMap<Integer, Course>();
-        courseList = new ArrayList<Course>();
-        ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
-        Call<List<Course>> call = chatServerAPI.getAllCourses();
+        _selectedCourses = new HashMap<>();
+        _courseList = new ArrayList<>();
+        Call<List<Course>> call = Client.shared().api().getAllCourses();
         call.enqueue(new Callback<List<Course>>() {
             Snackbar s;
             @Override
             public void onResponse(Call<List<Course>> call, Response<List<Course>> response) {
                 for(Course c : response.body()) {
-                    courseList.add(c);
+                    _courseList.add(c);
                 }
                 _avi.hide();
                 _selectCourses.setEnabled(true);
@@ -102,7 +98,7 @@ public class SignupActivity extends AppCompatActivity {
                 int checked = -1;
                 final CharSequence[] cs = new CharSequence[Constants.majors.length];
                 for(int i = 0; i < cs.length; i++) {
-                    if(Constants.majors[i] == selectedMajor) checked = i;
+                    if(Constants.majors[i] == _selectedMajor) checked = i;
                     cs[i] = Constants.majors[i];
                 }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
@@ -111,7 +107,7 @@ public class SignupActivity extends AppCompatActivity {
                         .setSingleChoiceItems(cs, checked, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                selectedMajor = (String) cs[which];
+                                _selectedMajor = (String) cs[which];
                             }
                         })
                         .create();
@@ -123,12 +119,12 @@ public class SignupActivity extends AppCompatActivity {
         _selectCourses.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CharSequence[] cs = new CharSequence[courseList.size()];
-                for(int i = 0; i < courseList.size(); i++) {
-                    cs[i] = courseList.get(i).getName();
+                CharSequence[] cs = new CharSequence[_courseList.size()];
+                for(int i = 0; i < _courseList.size(); i++) {
+                    cs[i] = _courseList.get(i).getName();
                 }
                 boolean[] checkedItems = new boolean[cs.length];
-                for(Map.Entry<Integer, Course> entry: selectedCourses.entrySet()) {
+                for(Map.Entry<Integer, Course> entry: _selectedCourses.entrySet()) {
                     checkedItems[entry.getKey()] = true;
                 }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
@@ -138,11 +134,11 @@ public class SignupActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                                 if(isChecked) {
-                                    if (selectedCourses.get(which) == null) {
-                                        selectedCourses.put(which, courseList.get(which));
+                                    if (_selectedCourses.get(which) == null) {
+                                        _selectedCourses.put(which, _courseList.get(which));
                                     }
                                 } else {
-                                    selectedCourses.remove(which);
+                                    _selectedCourses.remove(which);
                                 }
                             }
                         })
@@ -158,7 +154,7 @@ public class SignupActivity extends AppCompatActivity {
                 int checked = -1;
                 final CharSequence[] cs = new CharSequence[Constants.years.length];
                 for(int i = 0; i < cs.length; i++) {
-                    if(Constants.years[i] == selectedYear) checked = i;
+                    if(Constants.years[i] == _selectedYear) checked = i;
                     cs[i] = Constants.years[i];
                 }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
@@ -167,7 +163,7 @@ public class SignupActivity extends AppCompatActivity {
                         .setSingleChoiceItems(cs, checked, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                selectedYear = (String) cs[which];
+                                _selectedYear = (String) cs[which];
                             }
                         })
                         .create();
@@ -182,7 +178,7 @@ public class SignupActivity extends AppCompatActivity {
                 int checked = -1;
                 final CharSequence[] cs = new CharSequence[Constants.semesters.length];
                 for(int i = 0; i < cs.length; i++) {
-                    if(Constants.semesters[i] == selectedSemester) checked = i;
+                    if(Constants.semesters[i] == _selectedSemester) checked = i;
                     cs[i] = Constants.semesters[i];
                 }
                 final AlertDialog dialog = new AlertDialog.Builder(SignupActivity.this)
@@ -191,7 +187,7 @@ public class SignupActivity extends AppCompatActivity {
                         .setSingleChoiceItems(cs, checked, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                selectedSemester = (String) cs[which];
+                                _selectedSemester = (String) cs[which];
                             }
                         })
                         .create();
@@ -243,11 +239,11 @@ public class SignupActivity extends AppCompatActivity {
         user.setPassword(password);
         user.setFirstName(first);
         user.setLastName(last);
-        ArrayList<Course> selectedCourseList = new ArrayList<>(selectedCourses.values());
+        ArrayList<Course> selectedCourseList = new ArrayList<>(_selectedCourses.values());
         user.setCourses(selectedCourseList);
-        user.setMajor(selectedMajor);
-        user.setYear(selectedYear);
-        user.setSemester(selectedSemester);
+        user.setMajor(_selectedMajor);
+        user.setYear(_selectedYear);
+        user.setSemester(_selectedSemester);
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
         Call<User> call = chatServerAPI.createUser(user);
         progressDialog.show();
@@ -273,7 +269,6 @@ public class SignupActivity extends AppCompatActivity {
 
     public void onSignupFailed() {
         Toast.makeText(getBaseContext(), "Registration failed", Toast.LENGTH_LONG).show();
-
         _signupButton.setEnabled(true);
     }
 

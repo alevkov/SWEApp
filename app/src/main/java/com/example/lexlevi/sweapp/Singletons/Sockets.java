@@ -7,8 +7,8 @@ import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 
-public class SocketConnector {
-    private static SocketConnector instance = null;
+public class Sockets {
+    private static Sockets instance = null;
     private Socket _socket;
     {
         try {
@@ -16,13 +16,13 @@ public class SocketConnector {
         } catch (URISyntaxException e) {}
     }
 
-    protected SocketConnector() {
+    protected Sockets() {
         // Exists only to defeat instantiation.
     }
 
-    public static SocketConnector getInstance() {
+    public static Sockets shared() {
         if (instance == null) {
-            instance = new SocketConnector();
+            instance = new Sockets();
         }
         return instance;
     }
@@ -32,7 +32,7 @@ public class SocketConnector {
             connect();
             Gson g = new Gson();
             _socket.emit("userJoined",
-                    g.toJson(UserSession.getInstance().getCurrentUser()));
+                    g.toJson(Session.shared().user()));
         }
 
         return _socket;

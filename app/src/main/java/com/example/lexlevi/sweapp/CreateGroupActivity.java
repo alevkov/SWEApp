@@ -1,7 +1,5 @@
 package com.example.lexlevi.sweapp;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,7 +11,7 @@ import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.Group;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Session;
 
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -55,10 +53,10 @@ public class CreateGroupActivity extends AppCompatActivity {
         setTitle("");
         showProgress(false);
         _selectedCourse = new ArrayList<>();
-        _selectedCourse.add(UserSession.getInstance().getCurrentUser().getCourses().get(0));
+        _selectedCourse.add(Session.shared().user().getCourses().get(0));
         _days = new ArrayList<>();
 
-        _coursesSpinner.setItems(UserSession.getInstance().getCurrentUser().getCourses());
+        _coursesSpinner.setItems(Session.shared().user().getCourses());
         _coursesSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
@@ -130,12 +128,12 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
         group.setDays(_days);
         group.setIsPrivate(_isPrivate.isChecked());
-        group.setAcademicYear(UserSession.getInstance().getCurrentUser().getAcademicYear());
-        group.setSemester(UserSession.getInstance().getCurrentUser().getSemester());
+        group.setAcademicYear(Session.shared().user().getAcademicYear());
+        group.setSemester(Session.shared().user().getSemester());
         group.setDesc(_groupDescription.getText().toString());
         ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
-        Call<Group> call = chatServerAPI.createGroupForUser(UserSession.getInstance()
-                .getCurrentUser()
+        Call<Group> call = chatServerAPI.createGroupForUser(Session.shared()
+                .user()
                 .getId(), group);
         call.enqueue(new Callback<Group>() {
             @Override

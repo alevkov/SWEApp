@@ -32,7 +32,7 @@ import android.widget.TextView;
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.User;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Session;
 import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
@@ -312,7 +312,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Snackbar s;
                     switch (response.code()) {
                         case 200:
-                            UserSession.getInstance().setCurrentUser(response.body());
+                            Session.shared().setCurrentUser(response.body());
                             Intent intent = new Intent(LoginActivity.this,
                                                         DashboardActivity.class);
                             startActivity(intent);

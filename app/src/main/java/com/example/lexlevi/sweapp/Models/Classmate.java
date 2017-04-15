@@ -5,10 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-/**
- * Created by lexlevi on 4/1/17.
- */
-
 public class Classmate implements Serializable {
 
     @SerializedName("user")

@@ -15,8 +15,7 @@ import android.widget.TextView;
 import com.example.lexlevi.sweapp.Models.Course;
 import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.R;
-import com.example.lexlevi.sweapp.Singletons.ChatServerClient;
-import com.example.lexlevi.sweapp.Singletons.UserSession;
+import com.example.lexlevi.sweapp.Singletons.Session;
 
 import org.w3c.dom.Text;
 
@@ -89,12 +88,12 @@ public class DashboardProfile extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         _rootView = inflater.inflate(R.layout.fragment_dashboard_profile, container, false);
-        _username = UserSession.getInstance().getCurrentUser().getUserName();
-        _firstName = UserSession.getInstance().getCurrentUser().getFirstName();
-        _lastname = UserSession.getInstance().getCurrentUser().getLastName();
-        _year = UserSession.getInstance().getCurrentUser().getYear();
-        _email = UserSession.getInstance().getCurrentUser().getEmail();
-        _major = UserSession.getInstance().getCurrentUser().getMajor();
+        _username = Session.shared().user().getUserName();
+        _firstName = Session.shared().user().getFirstName();
+        _lastname = Session.shared().user().getLastName();
+        _year = Session.shared().user().getYear();
+        _email = Session.shared().user().getEmail();
+        _major = Session.shared().user().getMajor();
 
         _usernameTextView = (TextView) _rootView.findViewById(R.id.username_profile);
         _nameTextView = (TextView) _rootView.findViewById(R.id.name_profile) ;
@@ -110,7 +109,7 @@ public class DashboardProfile extends Fragment {
         _emailTextView.setText("E-mail: " +_email);
         _majorTextView.setText("Major: " + _major);
 
-        for (Course c : UserSession.getInstance().getCurrentUser().getCourses()) {
+        for (Course c : Session.shared().user().getCourses()) {
             courses += c.getName();
             courses += "\r\n";
         }
