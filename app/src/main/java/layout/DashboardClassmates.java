@@ -69,7 +69,7 @@ public class DashboardClassmates extends Fragment {
         _recyclerView = (RecyclerView) _rootView.findViewById(R.id.classmates_recyclerview);
         _avi = (AVLoadingIndicatorView) _rootView.findViewById(R.id.classmates_avi);
         _avi.show();
-        ClassmatesAdapter classmatesAdapter = new ClassmatesAdapter(getContext(),
+        ClassmatesAdapter classmatesAdapter = new ClassmatesAdapter(_recyclerView, getContext(),
                 _classmates.toArray(new Classmate[_classmates.size()]), _recyclerView);
         _recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _recyclerView.setAdapter(classmatesAdapter);
@@ -93,7 +93,7 @@ public class DashboardClassmates extends Fragment {
                 for(Classmate c : response.body()) {
                     _classmates.add(c);
                 }
-                ClassmatesAdapter classmatesAdapter = new ClassmatesAdapter(getContext(),
+                ClassmatesAdapter classmatesAdapter = new ClassmatesAdapter(_recyclerView, getContext(),
                         _classmates.toArray(new Classmate[_classmates.size()]), _recyclerView);
                 recyclerView.setAdapter(classmatesAdapter);
                 _avi.hide();

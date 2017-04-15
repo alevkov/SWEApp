@@ -74,6 +74,7 @@ public class DashboardGroups extends Fragment {
                         groups.add(g);
                     }
                 }
+                Session.shared().setCurrentUserGroups(groups);
                 GroupAdapter booksAdapter = new GroupAdapter(getContext(),
                         groups.toArray(new Group[groups.size()]));
                 view.setAdapter(booksAdapter);
