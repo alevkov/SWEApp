@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -27,8 +26,10 @@ import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Singletons.Client;
 import com.example.lexlevi.sweapp.Singletons.Sockets;
 import com.example.lexlevi.sweapp.Singletons.Session;
+import com.github.clans.fab.FloatingActionMenu;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
+import com.github.clans.fab.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +49,6 @@ import retrofit2.Response;
  */
 public class ChatListActivity extends AppCompatActivity {
 
-    private boolean _twoPane; // won't really be used
     private Socket _socket;
 
     public Group _group;
@@ -56,6 +56,7 @@ public class ChatListActivity extends AppCompatActivity {
     public ArrayList<String> _directChatUsers;
 
     public RecyclerView _chatListView;
+    public FloatingActionMenu _floatingMenu;
 
 
     @Override
@@ -75,16 +76,11 @@ public class ChatListActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
-
         View recyclerView = findViewById(R.id.chat_list);
         _chatListView = (RecyclerView) recyclerView;
         recyclerView.setBottom(3);
         _directChatUsers = new ArrayList<>();
         setupRecyclerView((RecyclerView) recyclerView);
-
-        if (findViewById(R.id.chat_detail_container) != null) {
-            _twoPane = true;
-        }
     }
 
     @Override
@@ -144,7 +140,7 @@ public class ChatListActivity extends AppCompatActivity {
                         _groupUsers = userResponse.body();
                         recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse,
                                 userResponse.body()));
-                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.chat_list_fab_chat);
                         fab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
