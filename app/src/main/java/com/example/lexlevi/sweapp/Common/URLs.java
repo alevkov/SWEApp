@@ -34,4 +34,9 @@ public class URLs {
     public static final String kUpdateChatForId = "chats/{id}/update";
     public static final String kDeleteChatForId = "chats/{id}/delete";
     public static final String kCreateNewMessageForChat = "chats/{id}/messages/new";
+
+    public static final String kGetEventsForGroup = "events/group/{groupId}";
+    public static final String kCreateNewEventForGroup = "events/{groupId}/new";
+    public static final String kUpdateEventForId = "events/{id}/update";
+    public static final String kDeleteEventForId = "events/{id}/delete";
 }
