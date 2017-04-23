@@ -94,6 +94,10 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
+        loadChatsForGroup(recyclerView);
+    }
+
+    private void loadChatsForGroup(@NonNull final RecyclerView recyclerView) {
         Call<List<Chat>> callChats = Client
                 .shared()
                 .api()
@@ -103,43 +107,16 @@ public class ChatListActivity extends AppCompatActivity {
             public void onResponse(Call<List<Chat>> call, final Response<List<Chat>> chatResponse) {
                 switch (chatResponse.code()) {
                     case 200:
-                        Call<List<User>> callUsers = Client.shared().api().getGroupUsersList(_group.getId());
-                        callUsers.enqueue(new Callback<List<User>>() { // call to load users chained after loading chats
-                            @Override
-                            public void onResponse(Call<List<User>> call, Response<List<User>> userResponse) {
-                                switch (userResponse.code()) {
-                                    case 200:
-                                        _groupUsers = userResponse.body();
-                                        recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse.body(),
-                                                userResponse.body()));
-                                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-                                        fab.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View view) {
-                                                Intent intent = new Intent(ChatListActivity.this,
-                                                        CreateChatActivity.class);
-                                                ArrayList<User> users = (ArrayList<User>) _groupUsers;
-                                                intent.putExtra("groupUsers", users);
-                                                intent.putExtra("groupId", _group.getId());
-                                                startActivity(intent);
-                                            }
-                                        });
-                                        break;
-                                }
-                            }
-                            @Override
-                            public void onFailure(Call<List<User>> call, Throwable t) { // fail to load users
-                                Snackbar s;
-                                s = Snackbar.make(recyclerView,
-                                        "Oops! Something went wrong",
-                                        Snackbar.LENGTH_LONG);
-                                s.getView().setBackgroundColor(getResources()
-                                        .getColor(R.color.excitedColor));
-                                s.show();
-                            }
-                        });
+                        loadUsersForGroup(recyclerView, chatResponse.body());
                         break;
                     case 404:
+                        Snackbar s;
+                        s = Snackbar.make(recyclerView,
+                                "Oops! Something went wrong",
+                                Snackbar.LENGTH_LONG);
+                        s.getView().setBackgroundColor(getResources()
+                                .getColor(R.color.excitedColor));
+                        s.show();
                         break;
                 }
             }
@@ -155,6 +132,45 @@ public class ChatListActivity extends AppCompatActivity {
                 s.show();
             }
         });
+    }
+
+    private void loadUsersForGroup(@NonNull final RecyclerView recyclerView, final List<Chat> chatResponse) {
+        Call<List<User>> callUsers = Client.shared().api().getGroupUsersList(_group.getId());
+        callUsers.enqueue(new Callback<List<User>>() { // call to load users chained after loading chats
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> userResponse) {
+                switch (userResponse.code()) {
+                    case 200:
+                        _groupUsers = userResponse.body();
+                        recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse,
+                                userResponse.body()));
+                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+                        fab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent intent = new Intent(ChatListActivity.this,
+                                        CreateChatActivity.class);
+                                ArrayList<User> users = (ArrayList<User>) _groupUsers;
+                                intent.putExtra("groupUsers", users);
+                                intent.putExtra("groupId", _group.getId());
+                                startActivity(intent);
+                            }
+                        });
+                        break;
+                }
+            }
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) { // fail to load users
+                Snackbar s;
+                s = Snackbar.make(recyclerView,
+                        "Oops! Something went wrong",
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources()
+                        .getColor(R.color.excitedColor));
+                s.show();
+            }
+        });
+
     }
 
     // Socket events
@@ -301,10 +317,7 @@ public class ChatListActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final ChatListVH holder,
-                                     int position,
-                                     int relativePosition,
-                                     int absolutePosition) {
+        public void onBindViewHolder(final ChatListVH holder, int position, int relativePosition, int absolutePosition) {
             switch (position) {
                 case 0:
                     holder._chat = _groupChats.get(relativePosition);
@@ -313,22 +326,11 @@ public class ChatListActivity extends AppCompatActivity {
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (_twoPane) {
-                                // Not implemented yet
-                                // Bundle arguments = new Bundle();
-                                // arguments.putSerializable(ChatDetailFragment.CHAT_ITEM, holder._chat);
-                                // ChatDetailFragment fragment = new ChatDetailFragment();
-                                // fragment.setArguments(arguments);
-                                // getSupportFragmentManager().beginTransaction()
-                                //     .replace(R.id.chat_detail_container, fragment)
-                                //     .commit();
-                            } else {
-                                Context context = v.getContext();
-                                Intent intent = new Intent(context, ChatDetailActivity.class);
-                                intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
-                                intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
-                                startActivity(intent);
-                            }
+                            Context context = v.getContext();
+                            Intent intent = new Intent(context, ChatDetailActivity.class);
+                            intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
+                            intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
+                            startActivity(intent);
                         }
                     });
                     break;
@@ -356,27 +358,13 @@ public class ChatListActivity extends AppCompatActivity {
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            if (_twoPane) {
-                                // Not implemented yet
-                                // Bundle arguments = new Bundle();
-                                // arguments.putSerializable(ChatDetailFragment.CHAT_ITEM, holder._chat);
-                                // ChatDetailFragment fragment = new ChatDetailFragment();
-                                // fragment.setArguments(arguments);
-                                // getSupportFragmentManager().beginTransaction()
-                                //     .replace(R.id.chat_detail_container, fragment)
-                                //     .commit();
-                            } else {
-                                Context context = v.getContext();
-                                Intent intent = new Intent(context, ChatDetailActivity.class);
-                                intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
-                                intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
-                                startActivity(intent);
-                            }
+                            Context context = v.getContext();
+                            Intent intent = new Intent(context, ChatDetailActivity.class);
+                            intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
+                            intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);
+                            startActivity(intent);
                         }
                     });
-                    // Self-chat
-                    // has only 1 participant, the current user
-
                     break;
                 default:
                     break;
