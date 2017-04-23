@@ -140,14 +140,26 @@ public class ChatListActivity extends AppCompatActivity {
                         _groupUsers = userResponse.body();
                         recyclerView.setAdapter(new ChatRecyclerViewAdapter(chatResponse,
                                 userResponse.body()));
-                        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.chat_list_fab_chat);
-                        fab.setOnClickListener(new View.OnClickListener() {
+                        FloatingActionButton chatFab = (FloatingActionButton) findViewById(R.id.chat_list_fab_chat);
+                        chatFab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 Intent intent = new Intent(ChatListActivity.this,
                                         CreateChatActivity.class);
                                 ArrayList<User> users = (ArrayList<User>) _groupUsers;
                                 intent.putExtra("groupUsers", users);
+                                intent.putExtra("groupId", _group.getId());
+                                startActivity(intent);
+                            }
+                        });
+                        FloatingActionButton eventFab = (FloatingActionButton) findViewById(R.id.chat_list_fab_event);
+                        eventFab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(ChatListActivity.this,
+                                        CreateEventActivity.class);
+//                                ArrayList<User> users = (ArrayList<User>) _groupUsers;
+//                                intent.putExtra("groupUsers", users);
                                 intent.putExtra("groupId", _group.getId());
                                 startActivity(intent);
                             }
