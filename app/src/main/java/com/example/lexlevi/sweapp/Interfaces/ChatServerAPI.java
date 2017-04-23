@@ -76,6 +76,6 @@ public interface ChatServerAPI {
     @GET(URLs.kGetEventsForGroup)
     Call<List<Event>> getEventsListForGroup(@Path("groupId") String groupId);
     @POST(URLs.kCreateNewEventForGroup)
-    Call<Chat> createChatForGroup(@Body Event event,
+    Call<Event> createEventForGroup(@Body Event event,
                                   @Path("groupId") String groupId);
 }
