@@ -137,9 +137,7 @@ public class ChatDetailFragment extends Fragment {
             public boolean onSubmit(CharSequence input) {
                 Message m = new Message();
                 Gson g = new Gson();
-                m.setAuthor(Session
-                .shared()
-                .user());
+                m.setAuthor(Session.shared().user());
                 m.setBody(input.toString());
                 m.setChat(_chat.getId());
                 m.setCreatedAt(new Date());
