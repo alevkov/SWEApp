@@ -8,25 +8,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Event;
-import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Singletons.Client;
-import com.example.lexlevi.sweapp.Singletons.Session;
 
 import com.wang.avi.AVLoadingIndicatorView;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.ListView;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import retrofit2.*;
 
