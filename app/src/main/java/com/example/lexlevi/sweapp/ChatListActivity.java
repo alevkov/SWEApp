@@ -49,8 +49,6 @@ import retrofit2.Response;
  */
 public class ChatListActivity extends AppCompatActivity {
 
-    private Socket _socket;
-
     public Group _group;
     public List<User> _groupUsers;
     public ArrayList<String> _directChatUsers;
@@ -63,15 +61,16 @@ public class ChatListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // set up socket events
-        _socket = Sockets.shared().getSocket();
-        _socket.on(Constants.sEvenUserJoin, onUserJoin);
-        _socket.on(Constants.sEventUpdateUsers, onUpdateUsers);
+
         // get selected group
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_chat_list);
         if (_group == null)
             _group = (Group) getIntent().getSerializableExtra(ChatDetailFragment.GROUP_ITEM);
         // view setup
+        Sockets.shared().getSocket(_group.getId()).on(Constants.sEventUserJoin, onUserJoin);
+        Sockets.shared().getSocket(_group.getId()).on(Constants.sEventUpdateUsers, onUpdateUsers);
+        Sockets.shared().getSocket(_group.getId()).on(Constants.sEventReminder, onEventReminder);
         setTitle(_group.getName());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,7 +85,16 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setupRecyclerView(_chatListView);
+       // setupRecyclerView(_chatListView);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Sockets.shared().getSocket(_group.getId()).off(Constants.sEventUserJoin, onUserJoin);
+        Sockets.shared().getSocket(_group.getId()).off(Constants.sEventUpdateUsers, onUpdateUsers);
+        Sockets.shared().getSocket(_group.getId()).off(Constants.sEventReminder, onEventReminder);
+        Sockets.shared().disconnect();
     }
 
     private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
@@ -94,10 +102,7 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     private void loadChatsForGroup(@NonNull final RecyclerView recyclerView) {
-        Call<List<Chat>> callChats = Client
-                .shared()
-                .api()
-                .getChatListForGroup(_group.getId());
+        Call<List<Chat>> callChats = Client.shared().api().getChatListForGroup(_group.getId());
         callChats.enqueue(new Callback<List<Chat>>() { // call to load group chats
             @Override
             public void onResponse(Call<List<Chat>> call, final Response<List<Chat>> chatResponse) {
@@ -201,6 +206,18 @@ public class ChatListActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     Log.d("UPDATE USERS: ", args[0] + "");
+                }
+            });
+        }
+    };
+
+    private Emitter.Listener onEventReminder = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("EVENT REMINDER: ", args[0] + "");
                 }
             });
         }
@@ -397,8 +414,8 @@ public class ChatListActivity extends AppCompatActivity {
         }
 
         public class ChatListVH extends RecyclerView.ViewHolder {
-            public final View _view;
 
+            public final View _view;
             public final TextView _idView;
             public final TextView _contentView;
             public final TextView _title;
@@ -421,6 +438,4 @@ public class ChatListActivity extends AppCompatActivity {
             }
         }
     }
-
-
 }

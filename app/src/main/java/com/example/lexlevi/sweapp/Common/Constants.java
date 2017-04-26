@@ -11,6 +11,7 @@ public final class Constants {
     // Sockets
     public static final String sEventNewMessage = "newMessage";
     public static final String sEventJoinChat = "enterChannel";
-    public static final String sEvenUserJoin = "update";
+    public static final String sEventUserJoin = "update";
     public static final String sEventUpdateUsers = "updateUsers";
+    public static final String sEventReminder = "reminder";
 }

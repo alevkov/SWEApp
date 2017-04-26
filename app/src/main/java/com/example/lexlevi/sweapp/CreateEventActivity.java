@@ -70,7 +70,11 @@ public class CreateEventActivity extends AppCompatActivity implements DatePicker
 
     @Override
     public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-        _eventDate = new Date(year, monthOfYear, dayOfMonth);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, monthOfYear);
+        calendar.set(Calendar.DATE, dayOfMonth);
+        _eventDate = calendar.getTime();
         _createdEvent.setDueDate(_eventDate);
     }
 

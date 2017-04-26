@@ -60,7 +60,7 @@ public class ChatDetailFragment extends Fragment {
             _chat = (Chat) getActivity().getIntent().getSerializableExtra(CHAT_ITEM);
             _group = (Group) getActivity().getIntent().getSerializableExtra(GROUP_ITEM);
 
-            _socket = Sockets.shared().getSocket();
+            _socket = Sockets.shared().getSocket(_group.getId());
             _socket.on(Constants.sEventNewMessage, onNewMessage);
             if (_socket.connected())
                 _socket.emit(Constants.sEventJoinChat, _chat.getId());
@@ -119,7 +119,6 @@ public class ChatDetailFragment extends Fragment {
                         messagesAvi.hide();
                         break;
                 }
-
             }
             @Override
             public void onFailure(Call<List<Message>> call, Throwable t) {
