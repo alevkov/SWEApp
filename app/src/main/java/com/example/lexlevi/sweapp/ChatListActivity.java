@@ -30,6 +30,9 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.github.clans.fab.FloatingActionButton;
+import com.tapadoo.alerter.Alerter;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -217,7 +220,11 @@ public class ChatListActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("EVENT REMINDER: ", args[0] + "");
+                    Alerter.create(ChatListActivity.this)
+                            .setTitle("Reminder!!!")
+                            .setText("YOOOOOOO")
+                            .setBackgroundColor(R.color.excitedColor)
+                            .show();
                 }
             });
         }
