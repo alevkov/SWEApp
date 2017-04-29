@@ -159,8 +159,8 @@ public class ChatDetailFragment extends Fragment {
                 @Override
                 public void run() {
                     _noMessagesView.setVisibility(View.GONE);
-                    Gson gson = new Gson();
-                    Message m = gson.fromJson((String) args[0], Message.class);
+                    Gson parser = new Gson();
+                    Message m = parser.fromJson((String) args[0], Message.class);
                     _chatAdapter.addToStart(m, true);
                 }
             });

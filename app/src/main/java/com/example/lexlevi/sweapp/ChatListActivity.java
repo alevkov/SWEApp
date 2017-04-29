@@ -21,7 +21,9 @@ import android.widget.TextView;
 import com.afollestad.sectionedrecyclerview.SectionedRecyclerViewAdapter;
 import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Models.Chat;
+import com.example.lexlevi.sweapp.Models.Event;
 import com.example.lexlevi.sweapp.Models.Group;
+import com.example.lexlevi.sweapp.Models.Message;
 import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Singletons.Client;
 import com.example.lexlevi.sweapp.Singletons.Sockets;
@@ -30,10 +32,16 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
 import com.github.clans.fab.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.tapadoo.alerter.Alerter;
+import com.tapadoo.alerter.OnHideAlertListener;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,18 +50,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * An activity representing a list of Chats. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ChatDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- */
 public class ChatListActivity extends AppCompatActivity {
 
     public Group _group;
     public List<User> _groupUsers;
+    public List<Event> _groupReminders;
     public ArrayList<String> _directChatUsers;
 
     public RecyclerView _chatListView;
@@ -63,8 +64,6 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // set up socket events
-
         // get selected group
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_chat_list);
@@ -72,8 +71,6 @@ public class ChatListActivity extends AppCompatActivity {
             _group = (Group) getIntent().getSerializableExtra(ChatDetailFragment.GROUP_ITEM);
         // view setup
         Sockets.shared().getSocket(_group.getId()).on(Constants.sEventUserJoin, onUserJoin);
-        Sockets.shared().getSocket(_group.getId()).on(Constants.sEventUpdateUsers, onUpdateUsers);
-        Sockets.shared().getSocket(_group.getId()).on(Constants.sEventReminder, onEventReminder);
         setTitle(_group.getName());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,20 +80,23 @@ public class ChatListActivity extends AppCompatActivity {
         recyclerView.setBottom(3);
         _directChatUsers = new ArrayList<>();
         setupRecyclerView((RecyclerView) recyclerView);
+        loadRemindersForGroup();
+        Sockets.shared().socket().on(Constants.sEventUpdateUsers, onUpdateUsers);
+        //Sockets.shared().socket().on(Constants.sEventReminder, onEventReminder);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-       // setupRecyclerView(_chatListView);
+        //setupRecyclerView(_chatListView);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Sockets.shared().getSocket(_group.getId()).off(Constants.sEventUserJoin, onUserJoin);
-        Sockets.shared().getSocket(_group.getId()).off(Constants.sEventUpdateUsers, onUpdateUsers);
-        Sockets.shared().getSocket(_group.getId()).off(Constants.sEventReminder, onEventReminder);
+        Sockets.shared().socket().off(Constants.sEventUserJoin, onUserJoin);
+        Sockets.shared().socket().off(Constants.sEventUpdateUsers, onUpdateUsers);
+        //Sockets.shared().socket().off(Constants.sEventReminder, onEventReminder);
         Sockets.shared().disconnect();
     }
 
@@ -124,7 +124,6 @@ public class ChatListActivity extends AppCompatActivity {
                         break;
                 }
             }
-
             @Override
             public void onFailure(Call<List<Chat>> call, Throwable t) { // fail to load chats
                 Snackbar s;
@@ -189,6 +188,52 @@ public class ChatListActivity extends AppCompatActivity {
 
     }
 
+    public void loadRemindersForGroup() {
+        Call<List<Event>> callEvents = Client.shared().api().getEventsListForGroup(_group.getId());
+        callEvents.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                switch (response.code()) {
+                    case 200:
+                        _groupReminders = response.body();
+                        Log.d("REMINDERS", response.body() + "");
+                        int i = 0;
+                        displayEvents(i);
+                        break;
+                }
+            }
+            @Override
+            public void onFailure(Call<List<Event>> call, Throwable t) {
+                Snackbar s;
+                s = Snackbar.make(_chatListView,
+                        "Oops! Something went wrong",
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources()
+                        .getColor(R.color.excitedColor));
+                s.show();
+            }
+        });
+    }
+
+    public void displayEvents(final int index) {
+        String formattedDate = new SimpleDateFormat("dd/MM/yyyy")
+                .format(_groupReminders.get(index).getDueDate());
+        Alerter.create(ChatListActivity.this)
+                .setTitle(_groupReminders.get(index).getName())
+                .setText("Due " + formattedDate)
+                .setBackgroundColor(R.color.excitedColor)
+                .setOnHideListener(new OnHideAlertListener() {
+                    @Override
+                    public void onHide() {
+                        int i = index;
+                        if (i < _groupReminders.size()) {
+                            displayEvents(++i);
+                        }
+                    }
+                })
+                .show();
+    }
+
     // Socket events
     private Emitter.Listener onUserJoin = new Emitter.Listener() {
         @Override
@@ -214,21 +259,28 @@ public class ChatListActivity extends AppCompatActivity {
         }
     };
 
-    private Emitter.Listener onEventReminder = new Emitter.Listener() {
-        @Override
-        public void call(final Object... args) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Alerter.create(ChatListActivity.this)
-                            .setTitle("Reminder!!!")
-                            .setText("YOOOOOOO")
-                            .setBackgroundColor(R.color.excitedColor)
-                            .show();
-                }
-            });
-        }
-    };
+//    private Emitter.Listener onEventReminder = new Emitter.Listener() {
+//        @Override
+//        public void call(final Object... args) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Gson parser = new Gson();
+//                    JSONArray o = (JSONArray) args[0];
+//                    Event[] le = parser.fromJson(o.toString(), Event[].class);
+//                    for (Event e : le) {
+//                        String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(e.getDueDate());
+//                        Alerter.create(ChatListActivity.this)
+//                                .setTitle(e.getName())
+//                                .setText("Due " + formattedDate)
+//                                .setBackgroundColor(R.color.excitedColor)
+//                                .show();
+//                    }
+//
+//                }
+//            });
+//        }
+//    };
 
     // Adapter
     public class ChatRecyclerViewAdapter

@@ -36,7 +36,10 @@ public class Sockets {
                     parser.toJson(Session.shared().user()),
                     groupId);
         }
+        return _socket;
+    }
 
+    public Socket socket() {
         return _socket;
     }
 

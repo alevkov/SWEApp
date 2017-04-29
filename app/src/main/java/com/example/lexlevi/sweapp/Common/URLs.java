@@ -4,7 +4,7 @@ public class URLs {
 
     // Base
     public static final String HEROKU = "https://uniteam-api.herokuapp.com/";
-    public static final String LOCAL = "http://192.168.1.135:3000/";
+    public static final String LOCAL = "http://192.168.1.98:3000/";
     public static final String BASE_API = LOCAL;
 
     // User Endpoints
@@ -13,7 +13,7 @@ public class URLs {
     public static final String kInviteUserToGroup = "users/invite/{userId}/from/{sender}";
     public static final String kUserLogin = "users/login";
     public static final String kUserSignup = "users/new";
-    public static final String kUserMatch = "/users/{id}/match";
+    public static final String kUserMatch = "users/{id}/match";
 
     // Course Endpoints
     public static final String kGetCourses = "courses";
