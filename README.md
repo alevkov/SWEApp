@@ -9,8 +9,8 @@ Backend: Node.js + Socket.io + MongoDB
 This is a work in progress.
 
 Features currently implemented:
-- Real-time messaging in group/private channels
-- Matching based on courses taken
+- Real-time messaging in group and 1-on-1 channels
+- Matching users with classmates based on courses taken
 - Reminders about upcoming deadlines for each group
 - Inviting classmates to join groups
 
