@@ -216,8 +216,7 @@ public class ChatListActivity extends AppCompatActivity {
             }
         });
     }
-
-    // Reminder UI
+    
     public void displayEvents(final int index) {
         String formattedDate = new SimpleDateFormat("dd/MM/yyyy")
                 .format(_groupReminders.get(index).getDueDate());
@@ -281,14 +280,12 @@ public class ChatListActivity extends AppCompatActivity {
                                 count += 1;
                             }
                             ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.put(chatId, count);
-                            final int idx = i;
                             _chatListView.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     _chatListView.getAdapter().notifyDataSetChanged();
                                 }
                             });
-
                         }
                     }
                 }
