@@ -59,12 +59,8 @@ public class ChatDetailFragment extends Fragment {
         if (getArguments().containsKey(CHAT_ITEM)) {
             _chat = (Chat) getActivity().getIntent().getSerializableExtra(CHAT_ITEM);
             _group = (Group) getActivity().getIntent().getSerializableExtra(GROUP_ITEM);
-
             _socket = Sockets.shared().getSocket(_group.getId());
             _socket.on(Constants.sEventNewMessage, onNewMessage);
-            if (_socket.connected())
-                _socket.emit(Constants.sEventJoinChat, _chat.getId());
-
             CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) getActivity()
                     .findViewById(R.id.chat_detail_toolbar_layout);
             String expandTitle = " # " + _chat.getName();
@@ -92,10 +88,7 @@ public class ChatDetailFragment extends Fragment {
         noMessages.setVisibility(View.GONE);
         RelativeLayout messagesListContainer = (RelativeLayout) _rView.findViewById(R.id.message_list_container);
         final MessagesList messagesList = (MessagesList) messagesListContainer.findViewById(R.id.messagesList);
-        final MessagesListAdapter<Message> adapter = new MessagesListAdapter<>(Session
-                .shared()
-                .user()
-                .getId(), null);
+        final MessagesListAdapter<Message> adapter = new MessagesListAdapter<>(Session.shared().user().getId(), null);
         _chatAdapter = adapter;
         messagesList.setAdapter(adapter);
         // Get latest Messages from Server

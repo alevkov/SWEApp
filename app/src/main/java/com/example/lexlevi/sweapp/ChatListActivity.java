@@ -82,7 +82,6 @@ public class ChatListActivity extends AppCompatActivity {
         setupRecyclerView((RecyclerView) recyclerView);
         loadRemindersForGroup();
         Sockets.shared().socket().on(Constants.sEventUpdateUsers, onUpdateUsers);
-        //Sockets.shared().socket().on(Constants.sEventReminder, onEventReminder);
     }
 
     @Override
@@ -96,7 +95,6 @@ public class ChatListActivity extends AppCompatActivity {
         super.onDestroy();
         Sockets.shared().socket().off(Constants.sEventUserJoin, onUserJoin);
         Sockets.shared().socket().off(Constants.sEventUpdateUsers, onUpdateUsers);
-        //Sockets.shared().socket().off(Constants.sEventReminder, onEventReminder);
         Sockets.shared().disconnect();
     }
 
@@ -112,6 +110,7 @@ public class ChatListActivity extends AppCompatActivity {
                 switch (chatResponse.code()) {
                     case 200:
                         loadUsersForGroup(recyclerView, chatResponse.body());
+                        joinChatsLoaded(chatResponse.body());
                         break;
                     case 404:
                         Snackbar s;
@@ -215,6 +214,7 @@ public class ChatListActivity extends AppCompatActivity {
         });
     }
 
+    // Reminder UI
     public void displayEvents(final int index) {
         String formattedDate = new SimpleDateFormat("dd/MM/yyyy")
                 .format(_groupReminders.get(index).getDueDate());
@@ -259,28 +259,25 @@ public class ChatListActivity extends AppCompatActivity {
         }
     };
 
-//    private Emitter.Listener onEventReminder = new Emitter.Listener() {
-//        @Override
-//        public void call(final Object... args) {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Gson parser = new Gson();
-//                    JSONArray o = (JSONArray) args[0];
-//                    Event[] le = parser.fromJson(o.toString(), Event[].class);
-//                    for (Event e : le) {
-//                        String formattedDate = new SimpleDateFormat("dd/MM/yyyy").format(e.getDueDate());
-//                        Alerter.create(ChatListActivity.this)
-//                                .setTitle(e.getName())
-//                                .setText("Due " + formattedDate)
-//                                .setBackgroundColor(R.color.excitedColor)
-//                                .show();
-//                    }
-//
-//                }
-//            });
-//        }
-//    };
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Gson parser = new Gson();
+                    Message m = parser.fromJson((String) args[0], Message.class);
+                }
+            });
+        }
+    };
+
+    private void joinChatsLoaded(List<Chat> chats) {
+        for (Chat c : chats) {
+            Sockets.shared().getSocket(_group.getId()).emit(Constants.sEventJoinChat, c.getId());
+        }
+        Sockets.shared().getSocket(_group.getId()).on(Constants.sEventNewMessage, onNewMessage);
+    }
 
     // Adapter
     public class ChatRecyclerViewAdapter
