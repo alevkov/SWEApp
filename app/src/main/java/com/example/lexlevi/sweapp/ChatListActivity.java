@@ -44,6 +44,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -87,6 +88,8 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (_chatListView.getAdapter() != null)
+            _chatListView.getAdapter().notifyDataSetChanged();
         //setupRecyclerView(_chatListView);
     }
 
@@ -267,6 +270,27 @@ public class ChatListActivity extends AppCompatActivity {
                 public void run() {
                     Gson parser = new Gson();
                     Message m = parser.fromJson((String) args[0], Message.class);
+                    String chatId = m.getChat();
+                    for (int i = 0; i < ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._chats.size(); i++) {
+                        if (chatId.equals(((ChatRecyclerViewAdapter)_chatListView.getAdapter())._chats.get(i).getId())) {
+                            Integer count;
+                            if (((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.get(chatId) == null) {
+                                count = 1;
+                            } else {
+                                count = ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.get(chatId);
+                                count += 1;
+                            }
+                            ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.put(chatId, count);
+                            final int idx = i;
+                            _chatListView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    _chatListView.getAdapter().notifyDataSetChanged();
+                                }
+                            });
+
+                        }
+                    }
                 }
             });
         }
@@ -284,31 +308,27 @@ public class ChatListActivity extends AppCompatActivity {
             extends SectionedRecyclerViewAdapter<ChatRecyclerViewAdapter.ChatListVH>
             implements PopupMenu.OnMenuItemClickListener {
 
-        private final List<Chat> _chats;
-        private final List<Chat> _groupChats;
-        private final List<Chat> _directChats;
-        private final List<User> _users;
+        public List<Chat> _chats;
+        public HashMap<String, Integer> _newMesasages;
+        public List<Chat> _groupChats;
+        public List<Chat> _directChats;
+        public List<User> _users;
 
         public ChatRecyclerViewAdapter(List<Chat> chats, List<User> users) {
             _chats = chats;
             _groupChats = new ArrayList<>();
             _directChats = new ArrayList<>();
+            _newMesasages = new HashMap<>();
             _users = users;
             for (Chat c : _chats) {
                 if (c.getIsGroupMessage()) {
                     _groupChats.add(c);
                 } else {
                     if (c.getParticipants().size() == 1 &&
-                            !c.getParticipants().get(0).equals(Session
-                            .shared()
-                            .user()
-                            .getId())) {
+                        !c.getParticipants().get(0).equals(Session.shared().user().getId())) {
                         continue;
                     } else if (c.getParticipants().size() > 1 &&
-                            !c.getParticipants().contains(Session
-                            .shared()
-                            .user()
-                            .getId())) {
+                        !c.getParticipants().contains(Session.shared().user().getId())) {
                         continue;
                     }
                     _directChats.add(c);
@@ -404,9 +424,16 @@ public class ChatListActivity extends AppCompatActivity {
                     holder._chat = _groupChats.get(relativePosition);
                     holder._idView.setText("#");
                     holder._contentView.setText(_groupChats.get(relativePosition).getName());
+                    if (_newMesasages.get(_groupChats.get(relativePosition).getId()) != null) {
+                        String content = holder._contentView.getText().toString();
+                        content += "    " + _newMesasages.get(_groupChats.get(relativePosition).getId());
+                        holder._contentView.setText(content);
+                    }
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            _newMesasages.remove(holder._chat.getId());
+                            notifyDataSetChanged();
                             Context context = v.getContext();
                             Intent intent = new Intent(context, ChatDetailActivity.class);
                             intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
