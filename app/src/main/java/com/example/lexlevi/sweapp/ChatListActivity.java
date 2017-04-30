@@ -463,9 +463,16 @@ public class ChatListActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    if (_newMesasages.get(_directChats.get(relativePosition).getId()) != null) {
+                        String content = holder._contentView.getText().toString();
+                        content += "    " + _newMesasages.get(_directChats.get(relativePosition).getId());
+                        holder._contentView.setText(content);
+                    }
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            _newMesasages.remove(holder._chat.getId());
+                            notifyDataSetChanged();
                             Context context = v.getContext();
                             Intent intent = new Intent(context, ChatDetailActivity.class);
                             intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
