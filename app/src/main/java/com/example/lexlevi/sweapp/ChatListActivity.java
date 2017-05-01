@@ -1,10 +1,12 @@
 package com.example.lexlevi.sweapp;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -61,6 +63,8 @@ public class ChatListActivity extends AppCompatActivity {
     public RecyclerView _chatListView;
     public FloatingActionMenu _floatingMenu;
 
+    private boolean isVisible = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +90,15 @@ public class ChatListActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        isVisible = false;
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        isVisible = true;
         if (_chatListView.getAdapter() != null)
             _chatListView.getAdapter().notifyDataSetChanged();
         //setupRecyclerView(_chatListView);
@@ -218,7 +229,7 @@ public class ChatListActivity extends AppCompatActivity {
     }
     
     public void displayEvents(final int index) {
-        String formattedDate = new SimpleDateFormat("dd/MM/yyyy")
+        final String formattedDate = new SimpleDateFormat("dd/MM/yyyy")
                 .format(_groupReminders.get(index).getDueDate());
         Alerter.create(ChatListActivity.this)
                 .setTitle(_groupReminders.get(index).getName())
@@ -233,7 +244,57 @@ public class ChatListActivity extends AppCompatActivity {
                         }
                     }
                 })
+                .setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final AlertDialog.Builder alert = new AlertDialog.Builder(ChatListActivity.this);
+                        alert.setTitle("Set " + "\"" + _groupReminders.get(index).getName() + "\" as Completed?");
+                        alert.setMessage("The due date for this task is " + formattedDate);
+                        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                setReminderCompleted(_groupReminders.get(index));
+                            }
+                        });
+                        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        AlertDialog dialog = alert.create();
+                        dialog.show();
+                    }
+                })
                 .show();
+    }
+
+    private void setReminderCompleted(Event e) {
+        e.setCompleted(true);
+        Call<Event> updateEvent = Client.shared().api().updateEventForId(e, e.getId());
+        updateEvent.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(Call<Event> call, Response<Event> response) {
+                Snackbar s;
+                s = Snackbar.make(_chatListView,
+                        "Done!",
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources()
+                        .getColor(R.color.cornflower_blue_two));
+                s.show();
+            }
+
+            @Override
+            public void onFailure(Call<Event> call, Throwable t) {
+                Snackbar s;
+                s = Snackbar.make(_chatListView,
+                        "Oops! Something went wrong",
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources()
+                        .getColor(R.color.excitedColor));
+                s.show();
+            }
+        });
     }
 
     // Socket events
@@ -267,6 +328,9 @@ public class ChatListActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (!isVisible) {
+                        return;
+                    }
                     Gson parser = new Gson();
                     Message m = parser.fromJson((String) args[0], Message.class);
                     String chatId = m.getChat();
