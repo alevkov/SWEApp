@@ -105,7 +105,7 @@ public class DashboardProfile extends Fragment {
         String courses = "";
         _usernameTextView.setText(_username);
         _nameTextView.setText(_firstName + " " + _lastname);
-        _yearTextView.setText("( "+_year+" )");
+        _yearTextView.setText(_year);
         _emailTextView.setText("E-mail: " +_email);
         _majorTextView.setText("Major: " + _major);
 

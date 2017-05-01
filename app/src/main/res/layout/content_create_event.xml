@@ -4,28 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/create_chat"
+    android:id="@+id/create_group"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.lexlevi.sweapp.CreateChatActivity"
-    tools:showIn="@layout/activity_create_chat">
+    tools:context="com.example.lexlevi.sweapp.CreateEventActivity"
+    tools:showIn="@layout/activity_create_event">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- Invites Label -->
-        <TextView android:id="@+id/invite_user_spinner"
+        <TextView android:id="@+id/duedate_picker"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
             android:layout_marginTop="24dp"
             android:layout_marginLeft="24dp"
-            android:text="Invite Members"
-            android:textSize="14dip"
+            android:text="Select Due Date"
+            android:textSize="14sp"
             android:textColor="@color/colorPrimary"/>
 
-        <com.wang.avi.AVLoadingIndicatorView android:id="@+id/create_chat_avi"
+        <com.wang.avi.AVLoadingIndicatorView android:id="@+id/create_event_avi"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             style="@style/AVLoadingIndicatorView"

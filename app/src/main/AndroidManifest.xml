@@ -36,6 +36,10 @@
             android:label="@string/title_activity_create_chat"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".CreateEventActivity"
+            android:label="@string/title_activity_create_event"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".DashboardActivity"
             android:label="@string/title_activity_dashboard"
             android:theme="@style/AppTheme.NoActionBar" />

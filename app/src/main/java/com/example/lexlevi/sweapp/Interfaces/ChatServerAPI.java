@@ -3,6 +3,7 @@ package com.example.lexlevi.sweapp.Interfaces;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.Classmate;
 import com.example.lexlevi.sweapp.Models.Course;
+import com.example.lexlevi.sweapp.Models.Event;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.Message;
 import com.example.lexlevi.sweapp.Models.User;
@@ -11,6 +12,7 @@ import com.example.lexlevi.sweapp.Common.URLs;
 import retrofit2.http.*;
 import retrofit2.Call;
 
+import java.net.URL;
 import java.util.List;
 
 public interface ChatServerAPI {
@@ -69,4 +71,14 @@ public interface ChatServerAPI {
     @POST(URLs.kCreateNewMessageForChat)
     Call<Message> createNewMessageForChat(@Path("id") String chatId,
                                           @Body Message message);
+
+    // Events
+    @GET(URLs.kGetEventsForGroup)
+    Call<List<Event>> getEventsListForGroup(@Path("groupId") String groupId);
+    @POST(URLs.kCreateNewEventForGroup)
+    Call<Event> createEventForGroup(@Body Event event,
+                                  @Path("groupId") String groupId);
+    @PATCH(URLs.kUpdateEventForId)
+    Call<Event> updateEventForId(@Body Event event,
+                                 @Path("id") String eventId);
 }

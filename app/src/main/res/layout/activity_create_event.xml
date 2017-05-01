@@ -5,18 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.example.lexlevi.sweapp.CreateChatActivity">
+    tools:context="com.example.lexlevi.sweapp.CreateEventActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/create_chat_app_bar"
+        android:id="@+id/create_event_app_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/group_create_bar_height"
+        android:background="@color/cornflower_blue_two"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        android:background="?attr/colorAccent">
+        android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/create_chat_toolbar_layout"
+            android:id="@+id/create_event_toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -24,28 +24,29 @@
             app:layout_scrollFlags="snap">
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp">
+
                     <EditText
-                        android:id="@+id/chat_name"
+                        android:id="@+id/event_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
-                        android:hint="#"
-                        android:maxLines="1"
                         android:background="@android:color/transparent"
+                        android:hint="Event Name"
+                        android:maxLines="1"
+                        android:paddingTop="4dp"
+                        android:singleLine="true"
                         android:textColor="@color/textColor"
                         android:textColorHighlight="@color/textColor"
                         android:textCursorDrawable="@null"
-                        android:paddingTop="4dp"
-                        android:textSize="30dp"
-                        android:singleLine="true" />
+                        android:textSize="30dp" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -53,30 +54,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp">
+
                     <EditText
-                        android:id="@+id/chat_description"
+                        android:id="@+id/event_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
-                        android:hint="Description"
                         android:background="@android:color/transparent"
+                        android:hint="Description"
                         android:maxLines="3"
                         android:paddingTop="4dp"
+                        android:singleLine="true"
                         android:textColor="@color/textColor"
                         android:textColorHighlight="@color/textColor"
                         android:textCursorDrawable="@null"
-                        android:textSize="15dp"
-                        android:singleLine="true" />
+                        android:textSize="15dp" />
 
                 </android.support.design.widget.TextInputLayout>
             </LinearLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_create_chat" />
+    <include layout="@layout/content_create_event" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/create_chat_fab"
+        android:id="@+id/create_event_inner_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

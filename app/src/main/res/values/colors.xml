@@ -7,6 +7,6 @@
     <color name="hilightColor">#7FBEE3</color>
     <color name="textColor">#FEFEFE</color>
     <color name="bgColor">#33446b</color>
-    <color name="navigationBarColor">#0BA08C</color>
-    <color name="excitedColor">#FC3A51</color>
+    <color name="navigationBarColor">#0ba08c</color>
+    <color name="excitedColor">#fc3a51</color>
 </resources>
