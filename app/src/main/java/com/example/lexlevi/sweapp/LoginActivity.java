@@ -100,9 +100,6 @@ public class LoginActivity extends AppCompatActivity {
                 goToRegistration();
             }
         });
-        if (Session.shared().valid()) {
-            goStraightToDashboard();
-        }
     }
 
     @Override
@@ -320,30 +317,30 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void goStraightToDashboard() {
-        Call<User> call = Client.shared().api().getUserForId(Session.shared().getUserId());
-        call.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                switch (response.code()) {
-                    case 200:
-                        Session.shared().setCurrentUser(response.body());
-                        Intent intent = new Intent(LoginActivity.this,
-                                DashboardActivity.class);
-                        startActivity(intent);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable t) {
-                Snackbar s;
-                s = Snackbar.make(_loginForm,
-                        R.string.error_oops,
-                        Snackbar.LENGTH_LONG);
-                s.getView().setBackgroundColor(getResources()
-                        .getColor(R.color.excitedColor));
-                s.show();
-            }
-        });
-    }
+//    public void goStraightToDashboard() {
+//        Call<User> call = Client.shared().api().getUserForId(Session.shared().getUserId());
+//        call.enqueue(new Callback<User>() {
+//            @Override
+//            public void onResponse(Call<User> call, Response<User> response) {
+//                switch (response.code()) {
+//                    case 200:
+//                        Session.shared().setCurrentUser(response.body());
+//                        Intent intent = new Intent(LoginActivity.this,
+//                                DashboardActivity.class);
+//                        startActivity(intent);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<User> call, Throwable t) {
+//                Snackbar s;
+//                s = Snackbar.make(_loginForm,
+//                        R.string.error_oops,
+//                        Snackbar.LENGTH_LONG);
+//                s.getView().setBackgroundColor(getResources()
+//                        .getColor(R.color.excitedColor));
+//                s.show();
+//            }
+//        });
+//    }
 }
