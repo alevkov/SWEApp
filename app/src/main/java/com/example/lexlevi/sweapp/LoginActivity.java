@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.example.lexlevi.sweapp.Common.URLs;
 import com.example.lexlevi.sweapp.Interfaces.ChatServerAPI;
 import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.Client;
 import com.example.lexlevi.sweapp.Singletons.Session;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -64,11 +65,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setTitle(" ");
+        _avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
+        _avi.hide();
+        Session.shared().setContext(getApplicationContext());
         // Set up the login form.
         _emailView = (AutoCompleteTextView) findViewById(R.id.email);
-        _avi = (AVLoadingIndicatorView) findViewById(R.id.avi);
         _loginForm = (ScrollView) findViewById(R.id.login_form);
-        _avi.hide();
         populateAutoComplete();
 
         _passwordView = (EditText) findViewById(R.id.password);
@@ -98,6 +100,21 @@ public class LoginActivity extends AppCompatActivity {
                 goToRegistration();
             }
         });
+        if (Session.shared().valid()) {
+            goStraightToDashboard();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (_avi != null) _avi.hide();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (_avi != null) _avi.hide();
     }
 
     private void populateAutoComplete() {
@@ -241,15 +258,10 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(URLs.BASE_API)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
             User user = new User();
             user.setEmail(mEmail);
             user.setPassword(mPassword);
-            ChatServerAPI chatServerAPI = retrofit.create(ChatServerAPI.class);
-            Call<User> call = chatServerAPI.loginUser(user);
+            Call<User> call = Client.shared().api().loginUser(user);
             call.enqueue(new Callback<User>() {
                 @Override
                 public void onResponse(Call<User> call, Response<User> response) {
@@ -306,5 +318,32 @@ public class LoginActivity extends AppCompatActivity {
             _loginAuthTask = null;
             showProgress(false);
         }
+    }
+
+    public void goStraightToDashboard() {
+        Call<User> call = Client.shared().api().getUserForId(Session.shared().getUserId());
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                switch (response.code()) {
+                    case 200:
+                        Session.shared().setCurrentUser(response.body());
+                        Intent intent = new Intent(LoginActivity.this,
+                                DashboardActivity.class);
+                        startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Snackbar s;
+                s = Snackbar.make(_loginForm,
+                        R.string.error_oops,
+                        Snackbar.LENGTH_LONG);
+                s.getView().setBackgroundColor(getResources()
+                        .getColor(R.color.excitedColor));
+                s.show();
+            }
+        });
     }
 }

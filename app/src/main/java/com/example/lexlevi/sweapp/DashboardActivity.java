@@ -142,4 +142,10 @@ public class DashboardActivity extends AppCompatActivity
     public void onProfileFragmentInteraction(Uri uri) {
 
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Session.shared().invalidateCredentials();
+    }
 }

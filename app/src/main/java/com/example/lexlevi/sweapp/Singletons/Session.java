@@ -1,5 +1,9 @@
 package com.example.lexlevi.sweapp.Singletons;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.example.lexlevi.sweapp.LoginActivity;
 import com.example.lexlevi.sweapp.Models.Group;
 import com.example.lexlevi.sweapp.Models.User;
 
@@ -10,10 +14,9 @@ public class Session {
     private static Session instance = null;
     private User currentUser;
     private List<Group> currentUserGroups;
+    private Context ctx;
 
-    protected Session() {
-        // Exists only to defeat instantiation.
-    }
+    protected Session() { }
 
     public static Session shared() {
         if(instance == null) {
@@ -24,6 +27,8 @@ public class Session {
 
     public User setCurrentUser(User u) {
         currentUser = u;
+        setEmail(u.getEmail());
+        setUserId(u.getId());
         return currentUser;
     }
 
@@ -39,6 +44,36 @@ public class Session {
     public List<Group> groups() { return currentUserGroups; }
 
     private boolean isUserInSession() {
-        return instance != null;
+        return instance != null && valid();
+    }
+
+    public void setContext(Context ctx) {
+        Storage.getInstance(ctx).setSettingsWithContext(ctx);
+        this.ctx = ctx;
+    }
+
+    private void setEmail(String t) {
+        Storage.getInstance(ctx).persistEmail(t);
+    }
+
+    private void setUserId(String id) {
+        Storage.getInstance(ctx).persistUserId(id);
+    }
+
+    public String getEmail() {
+        return Storage.getInstance(ctx).fetchEmail();
+    }
+
+    public String getUserId() {
+        return Storage.getInstance(ctx).fetchUserId();
+    }
+
+    public boolean valid() {
+        return Storage.getInstance(ctx).emailExists() && Storage.getInstance(ctx).userIdExists();
+    }
+
+    public void invalidateCredentials() {
+        currentUser = null;
+        Storage.getInstance(ctx).destroyCredentials();
     }
 }
