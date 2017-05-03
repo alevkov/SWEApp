@@ -16,6 +16,8 @@ public class Session {
     private List<Group> currentUserGroups;
     private Context ctx;
 
+    public boolean inMessageView = false;
+
     protected Session() { }
 
     public static Session shared() {

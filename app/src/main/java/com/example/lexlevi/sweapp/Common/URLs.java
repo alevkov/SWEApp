@@ -4,7 +4,7 @@ public class URLs {
 
     // Base
     public static final String HEROKU = "https://uniteam-api.herokuapp.com/";
-    public static final String LOCAL = "http://192.168.1.94:3000/";
+    public static final String LOCAL = "http://10.13.64.166:3000/";
     public static final String BASE_API = LOCAL;
 
     // User Endpoints

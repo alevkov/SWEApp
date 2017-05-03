@@ -1,5 +1,7 @@
 package com.example.lexlevi.sweapp;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -30,6 +33,7 @@ import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Singletons.Client;
 import com.example.lexlevi.sweapp.Singletons.Sockets;
 import com.example.lexlevi.sweapp.Singletons.Session;
+import com.example.lexlevi.sweapp.Singletons.Storage;
 import com.github.clans.fab.FloatingActionMenu;
 import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.Socket;
@@ -59,22 +63,20 @@ public class ChatListActivity extends AppCompatActivity {
     public List<User> _groupUsers;
     public List<Event> _groupReminders;
     public ArrayList<String> _directChatUsers;
+    public String _openedChat;
 
     public RecyclerView _chatListView;
     public FloatingActionMenu _floatingMenu;
-
-    private boolean isVisible = true;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // get selected group
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         setContentView(R.layout.activity_chat_list);
         if (_group == null)
             _group = (Group) getIntent().getSerializableExtra(ChatDetailFragment.GROUP_ITEM);
-        // view setup
+        invalidateSocketClient();
         Sockets.shared().getSocket(_group.getId()).on(Constants.sEventUserJoin, onUserJoin);
         setTitle(_group.getName());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -92,13 +94,11 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        isVisible = false;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        isVisible = true;
         if (_chatListView.getAdapter() != null)
             _chatListView.getAdapter().notifyDataSetChanged();
         //setupRecyclerView(_chatListView);
@@ -107,9 +107,7 @@ public class ChatListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Sockets.shared().socket().off(Constants.sEventUserJoin, onUserJoin);
-        Sockets.shared().socket().off(Constants.sEventUpdateUsers, onUpdateUsers);
-        Sockets.shared().disconnect();
+        invalidateSocketClient();
     }
 
     private void setupRecyclerView(@NonNull final RecyclerView recyclerView) {
@@ -328,22 +326,33 @@ public class ChatListActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (!isVisible) {
-                        return;
-                    }
                     Gson parser = new Gson();
                     Message m = parser.fromJson((String) args[0], Message.class);
                     String chatId = m.getChat();
+                    if (Session.shared().inMessageView && m.getChat().equals(_openedChat)) {
+                        return;
+                    }
+                    if (m.getAuthor().getId().equals(Session.shared().getUserId())) {
+                        return;
+                    }
+                    NotificationCompat.Builder builder = new NotificationCompat.Builder(ChatListActivity.this);
+                    builder.setContentTitle("From: " + m.getAuthor().getUserName() + " " + "[ " + _group.getName() + " ]");
+                    builder.setContentText(m.getRawBody());
+                    builder.setSmallIcon(R.drawable.send_icon);
+                    Intent notificationIntent = new Intent(ChatListActivity.this, DashboardActivity.class);
+                    PendingIntent contentIntent = PendingIntent.getActivity(ChatListActivity.this, 0, notificationIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+                    builder.setContentIntent(contentIntent);
+
+                    // Add as notification
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.notify(0, builder.build());
                     for (int i = 0; i < ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._chats.size(); i++) {
                         if (chatId.equals(((ChatRecyclerViewAdapter)_chatListView.getAdapter())._chats.get(i).getId())) {
-                            Integer count;
-                            if (((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.get(chatId) == null) {
-                                count = 1;
-                            } else {
-                                count = ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.get(chatId);
-                                count += 1;
-                            }
-                            ((ChatRecyclerViewAdapter)_chatListView.getAdapter())._newMesasages.put(chatId, count);
+                            Log.d("NEW MSG", ">>> CALLED >>>");
+                            Storage.getInstance(getApplicationContext())
+                                    .addNewNotifForChat(((ChatRecyclerViewAdapter)_chatListView.getAdapter())._chats.get(i).getId(),
+                                            _group.getId());
                             _chatListView.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -362,6 +371,15 @@ public class ChatListActivity extends AppCompatActivity {
             Sockets.shared().getSocket(_group.getId()).emit(Constants.sEventJoinChat, c.getId());
         }
         Sockets.shared().getSocket(_group.getId()).on(Constants.sEventNewMessage, onNewMessage);
+    }
+
+    private void invalidateSocketClient() {
+        if (Sockets.shared().socket() != null) {
+            Sockets.shared().socket().off(Constants.sEventUserJoin, onUserJoin);
+            Sockets.shared().socket().off(Constants.sEventUpdateUsers, onUpdateUsers);
+            Sockets.shared().socket().off(Constants.sEventNewMessage, onNewMessage);
+            Sockets.shared().disconnect();
+        }
     }
 
     // Adapter
@@ -485,16 +503,17 @@ public class ChatListActivity extends AppCompatActivity {
                     holder._chat = _groupChats.get(relativePosition);
                     holder._idView.setText("#");
                     holder._contentView.setText(_groupChats.get(relativePosition).getName());
-                    if (_newMesasages.get(_groupChats.get(relativePosition).getId()) != null) {
+                    if (Storage.getInstance(getApplicationContext()).fetchNotifForChat(holder._chat.getId(), _group.getId()) != null) {
                         String content = holder._contentView.getText().toString();
-                        content += "    " + _newMesasages.get(_groupChats.get(relativePosition).getId());
+                        content += "    " + Storage.getInstance(getApplicationContext()).fetchNotifForChat(holder._chat.getId(), _group.getId()).toString();
                         holder._contentView.setText(content);
                     }
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            _newMesasages.remove(holder._chat.getId());
+                            Storage.getInstance(getApplicationContext()).clearNotifsForChat(holder._chat.getId(), _group.getId());
                             notifyDataSetChanged();
+                            _openedChat = holder._chat.getId();
                             Context context = v.getContext();
                             Intent intent = new Intent(context, ChatDetailActivity.class);
                             intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
@@ -524,16 +543,17 @@ public class ChatListActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    if (_newMesasages.get(_directChats.get(relativePosition).getId()) != null) {
+                    if (Storage.getInstance(getApplicationContext()).fetchNotifForChat(holder._chat.getId(), _group.getId()) != null) {
                         String content = holder._contentView.getText().toString();
-                        content += "    " + _newMesasages.get(_directChats.get(relativePosition).getId());
+                        content += "    " + Storage.getInstance(getApplicationContext()).fetchNotifForChat(holder._chat.getId(), _group.getId()).toString();
                         holder._contentView.setText(content);
                     }
                     holder._view.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            _newMesasages.remove(holder._chat.getId());
+                            Storage.getInstance(getApplicationContext()).clearNotifsForChat(holder._chat.getId(), _group.getId());
                             notifyDataSetChanged();
+                            _openedChat = holder._chat.getId();
                             Context context = v.getContext();
                             Intent intent = new Intent(context, ChatDetailActivity.class);
                             intent.putExtra(ChatDetailFragment.CHAT_ITEM, holder._chat);
