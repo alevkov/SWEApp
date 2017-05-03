@@ -8,11 +8,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import com.example.lexlevi.sweapp.Common.Constants;
 import com.example.lexlevi.sweapp.Models.Chat;
 import com.example.lexlevi.sweapp.Models.User;
 import com.example.lexlevi.sweapp.Singletons.Client;
 import com.example.lexlevi.sweapp.Singletons.Session;
 
+import com.example.lexlevi.sweapp.Singletons.Sockets;
 import com.wang.avi.AVLoadingIndicatorView;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
@@ -122,6 +124,7 @@ public class CreateChatActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Chat> call, Response<Chat> response) {
                 showProgress(false);
+                Sockets.shared().getSocket(_groupId).emit(Constants.sEventJoinChat, response.body().getId());
                 Snackbar.make(_createChatFab, "Chat Created", Snackbar.LENGTH_LONG).show();
             }
 

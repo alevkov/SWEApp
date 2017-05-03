@@ -482,6 +482,7 @@ public class ChatListActivity extends AppCompatActivity {
                     // open the newly created directed chat
                     Context context = getApplicationContext();
                     Intent intent = new Intent(context, ChatDetailActivity.class);
+                    Sockets.shared().getSocket(_group.getId()).emit(Constants.sEventJoinChat, response.body().getId());
                     response.body().setName("@" + _groupUsers.get(item.getOrder()).getName());
                     intent.putExtra(ChatDetailFragment.CHAT_ITEM, response.body());
                     intent.putExtra(ChatDetailFragment.GROUP_ITEM, _group);

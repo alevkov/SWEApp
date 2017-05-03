@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -185,8 +186,18 @@ implements PopupMenu.OnMenuItemClickListener {
     private void sendInivitesToClassmate(final View v) {
         ArrayList<String> selectedGroupList = new ArrayList<>();
         for (Group g : _selectedGroups.values()) {
-            selectedGroupList.add(g.getId());
+            boolean alreadyThere = false;
+            for (String p : g.getParticipants()) {
+                if (p.equals(_classmates[_menuForPosition].getUser().getId())) {
+                    alreadyThere = true;
+                    break;
+                }
+            }
+            if (!alreadyThere)
+                selectedGroupList.add(g.getId());
         }
+        if (selectedGroupList.isEmpty())
+            return;
         Call<User> call = Client.shared().api().inviteUserToGroup(_classmates[_menuForPosition].getUser().getId(),
                                                 Session.shared().user().getFirstName(), selectedGroupList);
         call.enqueue(new Callback<User>() {
