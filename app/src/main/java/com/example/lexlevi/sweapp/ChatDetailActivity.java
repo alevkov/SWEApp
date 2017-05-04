@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
+import com.example.lexlevi.sweapp.Singletons.Session;
+
 public class ChatDetailActivity extends AppCompatActivity {
 
     @Override
@@ -35,6 +37,19 @@ public class ChatDetailActivity extends AppCompatActivity {
                     .add(R.id.chat_detail_container, fragment)
                     .commit();
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Session.shared().inMessageView = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Session.shared().inMessageView = true;
+        //setupRecyclerView(_chatListView);
     }
 
     @Override

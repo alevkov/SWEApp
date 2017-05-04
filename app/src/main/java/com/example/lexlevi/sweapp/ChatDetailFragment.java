@@ -154,7 +154,8 @@ public class ChatDetailFragment extends Fragment {
                     _noMessagesView.setVisibility(View.GONE);
                     Gson parser = new Gson();
                     Message m = parser.fromJson((String) args[0], Message.class);
-                    _chatAdapter.addToStart(m, true);
+                    if (m.getChat().equals(_chat.getId()))
+                        _chatAdapter.addToStart(m, true);
                 }
             });
         }

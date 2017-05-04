@@ -3,6 +3,7 @@ package com.example.lexlevi.sweapp;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -17,11 +18,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.lexlevi.sweapp.Models.User;
+import com.example.lexlevi.sweapp.Singletons.Client;
 import com.example.lexlevi.sweapp.Singletons.Session;
 
 import layout.DashboardClassmates;
 import layout.DashboardGroups;
 import layout.DashboardProfile;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DashboardActivity extends AppCompatActivity
         implements DashboardProfile.OnFragmentInteractionListener, DashboardClassmates.OnFragmentInteractionListener {
@@ -37,6 +43,30 @@ public class DashboardActivity extends AppCompatActivity
         if(Build.VERSION.SDK_INT >= 21)
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         setSupportActionBar(toolbar);
+        Session.shared().setContext(getApplicationContext());
+        if (!Session.shared().valid()) {
+            goToLogin();
+            return;
+        }
+        Call<User> call = Client.shared().api().getUserForId(Session.shared().getUserId());
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                switch (response.code()) {
+                    case 200:
+                        Session.shared().setCurrentUser(response.body());
+                        setUpView();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+            }
+        });
+
+    }
+
+    private void setUpView() {
         setTitle("Welcome, " + Session.shared().user().getName());
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -76,7 +106,6 @@ public class DashboardActivity extends AppCompatActivity
             }
         });
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,5 +170,17 @@ public class DashboardActivity extends AppCompatActivity
     @Override
     public void onProfileFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Session.shared().invalidateCredentials();
+        goToLogin();
+    }
+
+    public void goToLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 }
