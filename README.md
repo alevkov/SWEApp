@@ -13,9 +13,9 @@ Features currently implemented:
 - Matching users with classmates based on courses taken
 - Reminders about upcoming deadlines for each group
 - Inviting classmates to join groups
+- Push Notifications
+- In-group notifications with persistence
 
 Todo:
-- User Sessions with persistence
 - Messages pagination
 - Classmates pagination
-- Push notifications
