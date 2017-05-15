@@ -6,8 +6,6 @@ and allows them to create chat groups with each other.
 Frontend: Android application | 
 Backend: Node.js + Socket.io + MongoDB
 
-This is a work in progress.
-
 Features currently implemented:
 - Real-time messaging in group and 1-on-1 channels
 - Matching users with classmates based on courses taken
